@@ -1,14 +1,14 @@
 package uz.ilyoskhurozov.anyroute;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import uz.ilyoskhurozov.anyroute.component.Cable;
 import uz.ilyoskhurozov.anyroute.component.Router;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -18,6 +18,7 @@ public class Controller {
     private LinkedHashMap<String, LinkedHashMap<String, Cable>> cablesTable;
     private Cable currentCable;
     private final int DEFAULT_CABLE_LENGTH = 1;
+    private final TextInputDialog sizeDialog = new TextInputDialog();
 
     @FXML
     private AnchorPane desk;
@@ -43,6 +44,18 @@ public class Controller {
         algorithms.getSelectionModel().selectFirst();
 
         cablesTable = new LinkedHashMap<>();
+
+        sizeDialog.setHeaderText(null);
+        sizeDialog.setContentText(null);
+        sizeDialog.setGraphic(null);
+
+        sizeDialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(Bindings.not(Bindings.createBooleanBinding(() -> {
+            try {
+                return Integer.parseInt( sizeDialog.getEditor().getText()) > 0;
+            } catch (NumberFormatException e){
+                return false;
+            }
+        },sizeDialog.getEditor().textProperty())));
     }
 
     @FXML
@@ -85,6 +98,13 @@ public class Controller {
                                     cablesTable.get(cable.getBegin()).put(cable.getEnd(), null);
                                     cablesTable.get(cable.getEnd()).put(cable.getBegin(), null);
                                     desk.getChildren().remove(cable);
+                                } else if (mEvent.getClickCount() == 2) {
+                                    String[] names = new String[]{cable.getBegin(), cable.getEnd()};
+                                    Arrays.sort(names);
+                                    sizeDialog.setTitle(names[0] + " - " + names[1]);
+                                    sizeDialog.getEditor().setText(Integer.toString(cable.getLength()));
+
+                                    sizeDialog.showAndWait().ifPresent(lengthStr -> cable.setLength(Integer.parseInt(lengthStr)));
                                 }
                             });
                         }

@@ -5,9 +5,6 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
-/**
- * @author Ilyos Khurozov
- */
 public class Cable extends Group {
     private int length;
     private final Label label;
@@ -95,5 +92,11 @@ public class Cable extends Group {
 
     public void setLength(int length) {
         this.length = length;
+        label.setText(Integer.toString(length));
+    }
+
+    @Override
+    public String toString() {
+        return "Cable{"+length+"}";
     }
 }
