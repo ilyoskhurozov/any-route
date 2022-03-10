@@ -1,6 +1,7 @@
 package uz.ilyoskhurozov.anyroute;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -23,6 +24,9 @@ public class Controller {
 
     @FXML
     private ToggleButton removeBtn;
+
+    @FXML
+    private Button clearBtn;
 
     @FXML
     private ChoiceBox<String> algorithms;
