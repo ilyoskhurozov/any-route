@@ -33,6 +33,10 @@ public class Router extends VBox {
         makeDraggable();
     }
 
+    public String getName(){
+        return label.getText();
+    }
+
     private void setColor(Color color){
         icon.setIconColor(color);
         label.setTextFill(color);
