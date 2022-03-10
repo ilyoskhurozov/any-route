@@ -53,7 +53,7 @@
                            <FontIcon iconLiteral="mdi2c-close-thick" iconSize="40" selectionFill="BLACK" />
                        </graphic>
                    </ToggleButton>
-               <Button fx:id="clearBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false">
+               <Button contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" onAction="#clearDesk">
                   <graphic>
                      <FontIcon iconLiteral="mdi2d-delete-forever-outline" iconSize="40" selectionFill="BLACK" />
                   </graphic>

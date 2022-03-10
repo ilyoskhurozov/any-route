@@ -1,7 +1,6 @@
 package uz.ilyoskhurozov.anyroute;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
@@ -26,9 +25,6 @@ public class Controller {
     private ToggleButton removeBtn;
 
     @FXML
-    private Button clearBtn;
-
-    @FXML
     private ChoiceBox<String> algorithms;
 
     @FXML
@@ -46,5 +42,11 @@ public class Controller {
             Router router = new Router(++r, e.getX(), e.getY());
             desk.getChildren().add(router);
         }
+    }
+
+    @FXML
+    void clearDesk() {
+        desk.getChildren().clear();
+        r = 0;
     }
 }
