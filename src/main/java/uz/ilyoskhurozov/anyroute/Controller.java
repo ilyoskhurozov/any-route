@@ -84,9 +84,8 @@ public class Controller {
                                 if (removeBtn.isSelected()) {
                                     cablesTable.get(cable.getBegin()).put(cable.getEnd(), null);
                                     cablesTable.get(cable.getEnd()).put(cable.getBegin(), null);
+                                    desk.getChildren().remove(cable);
                                 }
-
-                                desk.getChildren().remove(cable);
                             });
                         }
 
