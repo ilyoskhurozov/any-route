@@ -10,6 +10,7 @@ import uz.ilyoskhurozov.anyroute.component.Cable;
 import uz.ilyoskhurozov.anyroute.component.Router;
 
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 
 public class Controller {
@@ -49,6 +50,7 @@ public class Controller {
         if (routerBtn.isSelected() && e.getTarget().equals(desk)){
             Router router = new Router(++r, e.getX(), e.getY());
 
+            String routerName = router.getName();
             router.setOnMouseClicked(mouseEvent -> {
                 if (cableBtn.isSelected()) {
                     if (currentCable == null) {
@@ -64,7 +66,7 @@ public class Controller {
                             currentCable.setEndY(event.getY()+Math.signum(currentCable.getStartY()- currentCable.getEndY()));
                         });
                     } else {
-                        if (cablesTable.get(currentCable.getBegin()).get(router.getName()) != null) {
+                        if (cablesTable.get(currentCable.getBegin()).get(routerName) != null) {
                             return;
                         }
                         currentCable.setEnd(router);
@@ -76,22 +78,42 @@ public class Controller {
                         } else {
                             cablesTable.get(currentCable.getBegin()).put(currentCable.getEnd(), currentCable);
                             cablesTable.get(currentCable.getEnd()).put(currentCable.getBegin(), currentCable);
+
+                            currentCable.setOnMouseClicked(mEvent -> {
+                                Cable cable = (Cable) mEvent.getSource();
+                                if (removeBtn.isSelected()) {
+                                    cablesTable.get(cable.getBegin()).put(cable.getEnd(), null);
+                                    cablesTable.get(cable.getEnd()).put(cable.getBegin(), null);
+                                }
+
+                                desk.getChildren().remove(cable);
+                            });
                         }
 
                         currentCable = null;
                         desk.setOnMouseMoved(null);
 
                     }
+                } else if (removeBtn.isSelected()) {
+                    desk.getChildren().remove(router);
+
+                    Set<String> names = cablesTable.remove(routerName).keySet();
+                    names.remove(routerName);
+                    names.forEach(name -> {
+                        Cable removedCable = cablesTable.get(name).remove(routerName);
+                        if (removedCable != null){
+                            desk.getChildren().remove(removedCable);
+                        }
+                    });
                 }
             });
 
             desk.getChildren().add(router);
 
-            String name = router.getName();
-            cablesTable.put(name, new LinkedHashMap<>(cablesTable.size()+1));
+            cablesTable.put(routerName, new LinkedHashMap<>(cablesTable.size()+1));
             cablesTable.keySet().forEach(rName -> {
-                cablesTable.get(rName).put(name, null);
-                cablesTable.get(name).put(rName, null);
+                cablesTable.get(rName).put(routerName, null);
+                cablesTable.get(routerName).put(rName, null);
             });
         }
     }
