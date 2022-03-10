@@ -1,5 +1,6 @@
 package uz.ilyoskhurozov.anyroute;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -142,5 +143,21 @@ public class Controller {
         cablesTable.clear();
         desk.getChildren().clear();
         r = 0;
+    }
+
+    //Menus
+
+    @FXML
+    void cancel() {
+        if (currentCable == null) return;
+
+        desk.getChildren().remove(currentCable);
+        desk.setOnMouseMoved(null);
+        currentCable = null;
+    }
+
+    @FXML
+    void close() {
+        Platform.exit();
     }
 }
