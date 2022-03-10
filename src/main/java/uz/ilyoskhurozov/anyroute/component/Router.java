@@ -1,5 +1,6 @@
 package uz.ilyoskhurozov.anyroute.component;
 
+import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -35,6 +36,10 @@ public class Router extends VBox {
 
     public String getName(){
         return label.getText();
+    }
+
+    public DoubleBinding heightProp(){
+        return heightProperty().subtract(label.heightProperty());
     }
 
     private void setColor(Color color){
