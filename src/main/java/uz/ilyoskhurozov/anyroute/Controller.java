@@ -8,10 +8,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import uz.ilyoskhurozov.anyroute.component.Cable;
 import uz.ilyoskhurozov.anyroute.component.Router;
+import uz.ilyoskhurozov.anyroute.util.FindRoute;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Set;
+import java.util.*;
 
 
 public class Controller {
@@ -37,6 +36,9 @@ public class Controller {
     private ChoiceBox<String> algorithms;
 
     @FXML
+    private Button findRouteBtn;
+
+    @FXML
     private void initialize() {
         ToggleGroup btns = new ToggleGroup();
         btns.getToggles().addAll(routerBtn, cableBtn, removeBtn);
@@ -52,16 +54,16 @@ public class Controller {
 
         sizeDialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(Bindings.not(Bindings.createBooleanBinding(() -> {
             try {
-                return Integer.parseInt( sizeDialog.getEditor().getText()) > 0;
-            } catch (NumberFormatException e){
+                return Integer.parseInt(sizeDialog.getEditor().getText()) > 0;
+            } catch (NumberFormatException e) {
                 return false;
             }
-        },sizeDialog.getEditor().textProperty())));
+        }, sizeDialog.getEditor().textProperty())));
     }
 
     @FXML
-    void mouseClickOnDesk(MouseEvent e){
-        if (routerBtn.isSelected() && e.getTarget().equals(desk)){
+    void mouseClickOnDesk(MouseEvent e) {
+        if (routerBtn.isSelected() && e.getTarget().equals(desk)) {
             Router router = new Router(++r, e.getX(), e.getY());
 
             String routerName = router.getName();
@@ -72,12 +74,12 @@ public class Controller {
                         desk.getChildren().add(currentCable);
 
                         currentCable.setBegin(router);
-                        currentCable.setEndX(router.getLayoutX()+mouseEvent.getX());
-                        currentCable.setEndY(router.getLayoutY()+mouseEvent.getY());
+                        currentCable.setEndX(router.getLayoutX() + mouseEvent.getX());
+                        currentCable.setEndY(router.getLayoutY() + mouseEvent.getY());
 
                         desk.setOnMouseMoved(event -> {
-                            currentCable.setEndX(event.getX()+Math.signum(currentCable.getStartX()- currentCable.getEndX()));
-                            currentCable.setEndY(event.getY()+Math.signum(currentCable.getStartY()- currentCable.getEndY()));
+                            currentCable.setEndX(event.getX() + Math.signum(currentCable.getStartX() - currentCable.getEndX()));
+                            currentCable.setEndY(event.getY() + Math.signum(currentCable.getStartY() - currentCable.getEndY()));
                         });
                     } else {
                         if (cablesTable.get(currentCable.getBegin()).get(routerName) != null) {
@@ -121,20 +123,24 @@ public class Controller {
                     names.remove(routerName);
                     names.forEach(name -> {
                         Cable removedCable = cablesTable.get(name).remove(routerName);
-                        if (removedCable != null){
+                        if (removedCable != null) {
                             desk.getChildren().remove(removedCable);
                         }
                     });
+
+                    findRouteBtn.setDisable(cablesTable.size() < 3);
                 }
             });
 
             desk.getChildren().add(router);
 
-            cablesTable.put(routerName, new LinkedHashMap<>(cablesTable.size()+1));
+            cablesTable.put(routerName, new LinkedHashMap<>(cablesTable.size() + 1));
             cablesTable.keySet().forEach(rName -> {
                 cablesTable.get(rName).put(routerName, null);
                 cablesTable.get(routerName).put(rName, null);
             });
+
+            findRouteBtn.setDisable(cablesTable.size() < 3);
         }
     }
 
@@ -142,7 +148,67 @@ public class Controller {
     void clearDesk() {
         cablesTable.clear();
         desk.getChildren().clear();
+        findRouteBtn.setDisable(true);
         r = 0;
+    }
+
+    @FXML
+    void findRoute() {
+        ChoiceDialog<String> choiceDialog = new ChoiceDialog<>();
+        choiceDialog.setGraphic(null);
+        choiceDialog.setHeaderText(null);
+        Set<String> routers = cablesTable.keySet();
+        choiceDialog.getItems().addAll(routers);
+        choiceDialog.setTitle("Start");
+        choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
+        choiceDialog.showAndWait().ifPresent(r1 -> {
+            choiceDialog.getItems().remove(r1);
+            choiceDialog.setTitle("End");
+            choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
+            choiceDialog.showAndWait().ifPresent(r2 -> {
+                System.out.println("Find path from " + r1 + " to " + r2);
+
+                Platform.runLater(() -> {
+                    Thread thread = new Thread(() -> {
+                        findRouteBtn.setDisable(true);
+
+                        String algo = algorithms.getValue();
+                        switch (algo) {
+                            case "Dijskstra": {
+                                List<String> route = FindRoute.withDijkstra(getLengthTable(), r1, r2);
+                                if (route == null) {
+                                    System.out.println("route not found");
+                                    //TODO route not found
+                                } else {
+                                    System.out.println(route);
+                                }
+                            }
+                            break;
+                        }
+
+                        findRouteBtn.setDisable(false);
+                    });
+
+                    thread.setDaemon(true);
+                    thread.start();
+                });
+            });
+        });
+
+    }
+
+    private LinkedHashMap<String, LinkedHashMap<String, Integer>> getLengthTable() {
+        LinkedHashMap<String, LinkedHashMap<String, Integer>> table = new LinkedHashMap<>();
+
+        cablesTable.forEach((r1, cableMap) -> {
+            LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
+
+            cableMap.forEach((r2, cable) -> map.put(r2, cable != null ? cable.getLength() : null));
+
+            table.put(r1, map);
+        });
+
+        return table;
     }
 
     //Menus

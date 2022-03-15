@@ -83,7 +83,7 @@
                    </VBox.margin>
                </Separator>
                <HBox alignment="CENTER">
-                   <Button focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="90.0">
+                   <Button fx:id="findRouteBtn" contentDisplay="GRAPHIC_ONLY" disable="true" focusTraversable="false" mnemonicParsing="false" onAction="#findRoute" prefHeight="50.0" prefWidth="90.0">
                        <font>
                            <Font name="JetBrains Mono Medium Nerd Font Complete Mono" size="16.0" />
                        </font>
