@@ -43,7 +43,7 @@ public class Controller {
 
     @FXML
     private void initialize() {
-        algorithms.getItems().addAll("Dijskstra", "algorithm 2", "algorithm 3", "algorithm 4", "algorithm 5");
+        algorithms.getItems().addAll("Dijskstra");
         algorithms.getSelectionModel().selectFirst();
 
         cablesTable = new LinkedHashMap<>();
