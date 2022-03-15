@@ -9,6 +9,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -41,8 +42,11 @@
                        <graphic>
                            <FontIcon iconLiteral="mdi2r-router" iconSize="40" selectionFill="BLACK" />
                        </graphic>
+                  <toggleGroup>
+                     <ToggleGroup fx:id="btns" />
+                  </toggleGroup>
                    </ToggleButton>
-                   <ToggleButton fx:id="cableBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="42.0">
+                   <ToggleButton fx:id="cableBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="42.0" toggleGroup="$btns">
                        <graphic>
                            <FontIcon iconLiteral="mdi2c-cable-data" iconSize="40" selectionFill="BLACK" />
                        </graphic>
@@ -52,7 +56,7 @@
                    <VBox.margin>
                        <Insets />
                    </VBox.margin>
-                   <ToggleButton fx:id="removeBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="42.0">
+                   <ToggleButton fx:id="removeBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="42.0" toggleGroup="$btns">
                        <graphic>
                            <FontIcon iconLiteral="mdi2c-close-thick" iconSize="40" selectionFill="BLACK" />
                        </graphic>

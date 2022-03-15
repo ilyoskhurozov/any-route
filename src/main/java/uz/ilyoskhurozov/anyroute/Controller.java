@@ -33,6 +33,9 @@ public class Controller {
     private ToggleButton removeBtn;
 
     @FXML
+    private ToggleGroup btns;
+
+    @FXML
     private ChoiceBox<String> algorithms;
 
     @FXML
@@ -40,9 +43,6 @@ public class Controller {
 
     @FXML
     private void initialize() {
-        ToggleGroup btns = new ToggleGroup();
-        btns.getToggles().addAll(routerBtn, cableBtn, removeBtn);
-
         algorithms.getItems().addAll("Dijskstra", "algorithm 2", "algorithm 3", "algorithm 4", "algorithm 5");
         algorithms.getSelectionModel().selectFirst();
 
@@ -54,7 +54,7 @@ public class Controller {
 
         sizeDialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(Bindings.not(Bindings.createBooleanBinding(() -> {
             try {
-                return Integer.parseInt(sizeDialog.getEditor().getText()) > 0;
+                return Integer.parseInt(sizeDialog.getEditor().getText()) != 0;
             } catch (NumberFormatException e) {
                 return false;
             }
@@ -215,11 +215,16 @@ public class Controller {
 
     @FXML
     void cancel() {
-        if (currentCable == null) return;
-
-        desk.getChildren().remove(currentCable);
-        desk.setOnMouseMoved(null);
-        currentCable = null;
+        if (currentCable == null) {
+            Toggle selectedBtn = btns.getSelectedToggle();
+            if (selectedBtn != null) {
+                selectedBtn.setSelected(false);
+            }
+        } else {
+            desk.getChildren().remove(currentCable);
+            desk.setOnMouseMoved(null);
+            currentCable = null;
+        }
     }
 
     @FXML
