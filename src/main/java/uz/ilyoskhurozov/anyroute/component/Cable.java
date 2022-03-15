@@ -1,5 +1,6 @@
 package uz.ilyoskhurozov.anyroute.component;
 
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
@@ -11,12 +12,15 @@ public class Cable extends Group {
     private final Line line;
     private String begin;
     private String end;
+    private boolean isSendingPackages = false;
+    private Color defColor;
 
     public Cable(int length) {
         this.length = length;
         label = new Label(length + "");
         line = new Line();
         line.setStrokeWidth(2);
+        defColor = Color.BLACK;
 
         getChildren().add(line);
         makeHoverable();
@@ -53,12 +57,52 @@ public class Cable extends Group {
         line.setStroke(color);
     }
 
+    public void startSendingPackages(boolean isBeginToEnd) {
+        isSendingPackages = true;
+        setDefColor(Color.GREEN);
+        double begin = (isBeginToEnd) ? 5.0 : 25;
+        double step = (isBeginToEnd) ? 5 : -5;
+        Thread animation = new Thread(() -> {
+            while (isSendingPackages) {
+                for (double i = begin; isSendingPackages && ((isBeginToEnd) ? i < 26.0 : i > 4.0); i += step) {
+                    double finalI = i;
+                    Platform.runLater(() -> {
+                        line.getStrokeDashArray().clear();
+                        line.getStrokeDashArray().addAll(finalI, 5.0);
+                        double l = Math.sqrt(Math.pow(line.getStartX() - line.getEndX(), 2) + Math.pow(line.getStartY() - line.getEndY(), 2)) - finalI - 5;
+                        while (l > -1) {
+                            line.getStrokeDashArray().addAll(25.0, 5.0);
+                            l -= 30;
+                        }
+                    });
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+            }
+            line.getStrokeDashArray().clear();
+            setDefColor(Color.BLACK);
+        });
+        animation.setDaemon(true);
+        animation.start();
+    }
+
+    public void stopSendingPackages() {
+        isSendingPackages = false;
+    }
+
+    private void setDefColor(Color color) {
+        defColor = color;
+        setColor(defColor);
+    }
+
     private void makeHoverable() {
         label.onMouseEnteredProperty().bind(onMouseEnteredProperty());
         label.onMouseExitedProperty().bind(onMouseExitedProperty());
 
         setOnMouseEntered(mouseEvent -> setColor(Color.STEELBLUE));
-        setOnMouseExited(mouseEvent -> setColor(Color.BLACK));
+        setOnMouseExited(mouseEvent -> setColor(defColor));
     }
 
     public double getStartX() {

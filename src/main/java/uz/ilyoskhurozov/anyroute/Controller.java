@@ -19,6 +19,7 @@ public class Controller {
     private Cable currentCable;
     private final int DEFAULT_CABLE_LENGTH = 1;
     private final TextInputDialog sizeDialog = new TextInputDialog();
+    private final ArrayList<Cable> animatingCables = new ArrayList<>();
 
     @FXML
     private AnchorPane desk;
@@ -101,7 +102,7 @@ public class Controller {
                                     cablesTable.get(cable.getBegin()).put(cable.getEnd(), null);
                                     cablesTable.get(cable.getEnd()).put(cable.getBegin(), null);
                                     desk.getChildren().remove(cable);
-                                } else if (mEvent.getClickCount() == 2) {
+                                } else if (mEvent.getClickCount() == 2 && animatingCables.isEmpty()) {
                                     String[] names = new String[]{cable.getBegin(), cable.getEnd()};
                                     Arrays.sort(names);
                                     sizeDialog.setTitle(names[0] + " - " + names[1]);
@@ -128,7 +129,7 @@ public class Controller {
                         }
                     });
 
-                    findRouteBtn.setDisable(cablesTable.size() < 3);
+                    findRouteBtn.setDisable(cablesTable.size() < 2);
                 }
             });
 
@@ -140,7 +141,7 @@ public class Controller {
                 cablesTable.get(routerName).put(rName, null);
             });
 
-            findRouteBtn.setDisable(cablesTable.size() < 3);
+            findRouteBtn.setDisable(cablesTable.size() < 2);
         }
     }
 
@@ -162,28 +163,41 @@ public class Controller {
         choiceDialog.setTitle("Start");
         choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
         choiceDialog.showAndWait().ifPresent(r1 -> {
+            animatingCables.parallelStream().forEach(Cable::stopSendingPackages);
+            animatingCables.clear();
+
             choiceDialog.getItems().remove(r1);
             choiceDialog.setTitle("End");
             choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
             choiceDialog.showAndWait().ifPresent(r2 -> {
-                System.out.println("Find path from " + r1 + " to " + r2);
-
                 Platform.runLater(() -> {
                     Thread thread = new Thread(() -> {
                         findRouteBtn.setDisable(true);
 
                         String algo = algorithms.getValue();
+                        List<String> route = null;
                         switch (algo) {
                             case "Dijskstra": {
-                                List<String> route = FindRoute.withDijkstra(getLengthTable(), r1, r2);
-                                if (route == null) {
-                                    System.out.println("route not found");
-                                    //TODO route not found
-                                } else {
-                                    System.out.println(route);
-                                }
+                                route = FindRoute.withDijkstra(getLengthTable(), r1, r2);
                             }
                             break;
+                        }
+
+                        if (route == null) {
+                            System.out.println("route not found");
+                            //TODO route not found
+                        } else {
+                            String p1;
+                            String p2 = route.get(0);
+
+                            for (int i = 1; i < route.size(); i++) {
+                                p1 = p2;
+                                p2 = route.get(i);
+
+                                Cable cable = cablesTable.get(p1).get(p2);
+                                cable.startSendingPackages(cable.getBegin().equals(p1));
+                                animatingCables.add(cable);
+                            }
                         }
 
                         findRouteBtn.setDisable(false);
