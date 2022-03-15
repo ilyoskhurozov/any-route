@@ -1,8 +1,11 @@
 package uz.ilyoskhurozov.anyroute.component;
 
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
@@ -18,6 +21,8 @@ public class Cable extends Group {
     public Cable(int length) {
         this.length = length;
         label = new Label(length + "");
+        label.setPadding(new Insets(0, 5, 0 , 5));
+        label.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
         line = new Line();
         line.setStrokeWidth(2);
         defColor = Color.BLACK;
@@ -43,8 +48,8 @@ public class Cable extends Group {
         line.endXProperty().bind(router.layoutXProperty().add(router.widthProperty().divide(2.0)));
         line.endYProperty().bind(router.layoutYProperty().add(router.heightProp().divide(2.0)));
 
-        label.translateXProperty().bind(line.startXProperty().add(line.endXProperty()).divide(2.0));
-        label.translateYProperty().bind(line.startYProperty().add(line.endYProperty()).divide(2.0));
+        label.translateXProperty().bind(line.startXProperty().add(line.endXProperty()).divide(2.0).subtract(label.widthProperty().divide(2)));
+        label.translateYProperty().bind(line.startYProperty().add(line.endYProperty()).divide(2.0).subtract(label.heightProperty().divide(2)));
         getChildren().add(label);
     }
 
