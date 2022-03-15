@@ -43,6 +43,9 @@ public class Controller {
     private Button findRouteBtn;
 
     @FXML
+    private Button stopBtn;
+
+    @FXML
     private void initialize() {
         algorithms.getItems().addAll("Dijskstra");
         algorithms.getSelectionModel().selectFirst();
@@ -163,52 +166,57 @@ public class Controller {
         choiceDialog.setTitle("Start");
         choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
         choiceDialog.showAndWait().ifPresent(r1 -> {
-            animatingCables.parallelStream().forEach(Cable::stopSendingPackages);
-            animatingCables.clear();
+            stopAnimation();
 
             choiceDialog.getItems().remove(r1);
             choiceDialog.setTitle("End");
             choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
-            choiceDialog.showAndWait().ifPresent(r2 -> {
-                Platform.runLater(() -> {
-                    Thread thread = new Thread(() -> {
-                        findRouteBtn.setDisable(true);
+            choiceDialog.showAndWait().ifPresent(r2 -> Platform.runLater(() -> {
+                Thread thread = new Thread(() -> {
+                    findRouteBtn.setDisable(true);
 
-                        String algo = algorithms.getValue();
-                        List<String> route = null;
-                        switch (algo) {
-                            case "Dijskstra": {
-                                route = FindRoute.withDijkstra(getLengthTable(), r1, r2);
-                            }
-                            break;
+                    String algo = algorithms.getValue();
+                    List<String> route = null;
+                    switch (algo) {
+                        case "Dijskstra": {
+                            route = FindRoute.withDijkstra(getLengthTable(), r1, r2);
                         }
+                        break;
+                    }
 
-                        if (route == null) {
-                            System.out.println("route not found");
-                            //TODO route not found
-                        } else {
-                            String p1;
-                            String p2 = route.get(0);
+                    if (route == null) {
+                        System.out.println("route not found");
+                        //TODO route not found
+                    } else {
+                        String p1;
+                        String p2 = route.get(0);
 
-                            for (int i = 1; i < route.size(); i++) {
-                                p1 = p2;
-                                p2 = route.get(i);
+                        for (int i = 1; i < route.size(); i++) {
+                            p1 = p2;
+                            p2 = route.get(i);
 
-                                Cable cable = cablesTable.get(p1).get(p2);
-                                cable.startSendingPackages(cable.getBegin().equals(p1));
-                                animatingCables.add(cable);
-                            }
+                            Cable cable = cablesTable.get(p1).get(p2);
+                            cable.startSendingPackages(cable.getBegin().equals(p1));
+                            animatingCables.add(cable);
                         }
+                        stopBtn.setDisable(false);
+                    }
 
-                        findRouteBtn.setDisable(false);
-                    });
-
-                    thread.setDaemon(true);
-                    thread.start();
+                    findRouteBtn.setDisable(false);
                 });
-            });
-        });
 
+                thread.setDaemon(true);
+                thread.start();
+            }));
+        });
+    }
+
+    @FXML
+    void stopAnimation() {
+        animatingCables.parallelStream().forEach(Cable::stopSendingPackages);
+        animatingCables.clear();
+
+        stopBtn.setDisable(true);
     }
 
     private LinkedHashMap<String, LinkedHashMap<String, Integer>> getLengthTable() {
