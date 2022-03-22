@@ -6,11 +6,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import uz.ilyoskhurozov.anyroute.component.Cable;
 import uz.ilyoskhurozov.anyroute.component.Router;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 public class Controller {
@@ -44,6 +46,15 @@ public class Controller {
 
     @FXML
     private Button stopBtn;
+
+    @FXML
+    private VBox resultsPane;
+
+    @FXML
+    private Label time;
+
+    @FXML
+    private Label distance;
 
     @FXML
     private void initialize() {
@@ -167,6 +178,7 @@ public class Controller {
         choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
         choiceDialog.showAndWait().ifPresent(r1 -> {
             stopAnimation();
+            resultsPane.setVisible(false);
 
             choiceDialog.getItems().remove(r1);
             choiceDialog.setTitle("End");
@@ -177,9 +189,12 @@ public class Controller {
 
                     String algo = algorithms.getValue();
                     List<String> route = null;
+                    AtomicLong begin = new AtomicLong(), end = new AtomicLong();
                     switch (algo) {
                         case "Dijskstra": {
-                            route = FindRoute.withDijkstra(getLengthTable(), r1, r2);
+                            begin.set(System.nanoTime());
+                            route = FindRoute.withDijkstra(cablesTable, r1, r2);
+                            end.set(System.nanoTime());
                         }
                         break;
                     }
@@ -191,6 +206,8 @@ public class Controller {
                         String p1;
                         String p2 = route.get(0);
 
+                        AtomicLong dis = new AtomicLong(0);
+
                         for (int i = 1; i < route.size(); i++) {
                             p1 = p2;
                             p2 = route.get(i);
@@ -198,8 +215,34 @@ public class Controller {
                             Cable cable = cablesTable.get(p1).get(p2);
                             cable.startSendingPackages(cable.getBegin().equals(p1));
                             animatingCables.add(cable);
+                            dis.addAndGet(cable.getLength());
                         }
                         stopBtn.setDisable(false);
+                        Platform.runLater(() -> {
+                            long t = end.get()-begin.get();
+                            long frac = 0;
+                            String unit = "ns";
+                            if (t > 1000) {
+                                frac = t % 1000;
+                                t /= 1000;
+                                unit = "mks";
+
+                                if (t > 1000) {
+                                    frac = t % 1000;
+                                    t /= 1000;
+                                    unit = "ms";
+
+                                    if (t > 1000) {
+                                        frac = t % 1000;
+                                        t /= 1000;
+                                        unit = "s";
+                                    }
+                                }
+                            }
+                            time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
+                            distance.setText(dis.get()+"");
+                        });
+                        resultsPane.setVisible(true);
                     }
 
                     findRouteBtn.setDisable(false);
@@ -213,24 +256,10 @@ public class Controller {
 
     @FXML
     void stopAnimation() {
-        animatingCables.parallelStream().forEach(Cable::stopSendingPackages);
+        animatingCables.forEach(Cable::stopSendingPackages);
         animatingCables.clear();
 
         stopBtn.setDisable(true);
-    }
-
-    private LinkedHashMap<String, LinkedHashMap<String, Integer>> getLengthTable() {
-        LinkedHashMap<String, LinkedHashMap<String, Integer>> table = new LinkedHashMap<>();
-
-        cablesTable.forEach((r1, cableMap) -> {
-            LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
-
-            cableMap.forEach((r2, cable) -> map.put(r2, cable != null ? cable.getLength() : null));
-
-            table.put(r1, map);
-        });
-
-        return table;
     }
 
     //Menus
