@@ -25,6 +25,7 @@ public class Controller {
     private Cable currentCable;
     private final int DEFAULT_CABLE_LENGTH = 1;
     private final TextInputDialog sizeDialog = new TextInputDialog();
+    private final Alert noRouteAlert = new Alert(Alert.AlertType.WARNING);
     private final ArrayList<Cable> animatingCables = new ArrayList<>();
 
     @FXML
@@ -78,6 +79,9 @@ public class Controller {
                 return false;
             }
         }, sizeDialog.getEditor().textProperty())));
+
+        noRouteAlert.setHeaderText(null);
+        noRouteAlert.setContentText("Couldn't find route! Make sure to all cables are connected correctly.");
     }
 
     public void bindKeys(){
@@ -242,8 +246,7 @@ public class Controller {
                     }
 
                     if (route == null) {
-                        System.out.println("route not found");
-                        //TODO route not found
+                        Platform.runLater(noRouteAlert::showAndWait);
                     } else {
                         String p1;
                         String p2 = route.get(0);
