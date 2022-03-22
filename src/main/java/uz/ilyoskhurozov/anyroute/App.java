@@ -18,6 +18,8 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("/images/gps.png"))));
+        Controller controller = fxmlLoader.getController();
+        controller.bindKeys();
         stage.show();
     }
 

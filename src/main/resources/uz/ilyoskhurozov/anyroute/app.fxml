@@ -143,11 +143,6 @@
    <top>
        <MenuBar BorderPane.alignment="CENTER">
            <Menu mnemonicParsing="false" text="Menu">
-               <MenuItem mnemonicParsing="false" onAction="#cancel" text="Cancel" visible="false">
-                   <accelerator>
-                       <KeyCodeCombination alt="UP" code="ESCAPE" control="ANY" meta="UP" shift="UP" shortcut="UP" />
-                   </accelerator>
-               </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#close" text="Exit">
                <accelerator>
                   <KeyCodeCombination alt="DOWN" code="X" control="UP" meta="UP" shift="UP" shortcut="UP" />

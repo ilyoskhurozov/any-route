@@ -3,7 +3,11 @@ package uz.ilyoskhurozov.anyroute;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
@@ -74,6 +78,39 @@ public class Controller {
                 return false;
             }
         }, sizeDialog.getEditor().textProperty())));
+    }
+
+    public void bindKeys(){
+        Scene scene = desk.getScene();
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN),
+                () -> routerBtn.setSelected(true)
+        );
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN),
+                () -> cableBtn.setSelected(true)
+        );
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
+                () -> removeBtn.setSelected(true)
+        );
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.CONTROL_ANY),
+                this::cancel
+        );
+    }
+
+    private void cancel() {
+        if (currentCable == null) {
+            Toggle selectedBtn = btns.getSelectedToggle();
+            if (selectedBtn != null) {
+                selectedBtn.setSelected(false);
+            }
+        } else {
+            desk.getChildren().remove(currentCable);
+            desk.setOnMouseMoved(null);
+            currentCable = null;
+        }
     }
 
     @FXML
@@ -267,20 +304,6 @@ public class Controller {
     }
 
     //Menus
-
-    @FXML
-    void cancel() {
-        if (currentCable == null) {
-            Toggle selectedBtn = btns.getSelectedToggle();
-            if (selectedBtn != null) {
-                selectedBtn.setSelected(false);
-            }
-        } else {
-            desk.getChildren().remove(currentCable);
-            desk.setOnMouseMoved(null);
-            currentCable = null;
-        }
-    }
 
     @FXML
     void close() {
