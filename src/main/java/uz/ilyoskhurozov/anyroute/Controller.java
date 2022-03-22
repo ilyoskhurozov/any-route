@@ -111,12 +111,15 @@ public class Controller {
                             cablesTable.get(currentCable.getEnd()).put(currentCable.getBegin(), currentCable);
 
                             currentCable.setOnMouseClicked(mEvent -> {
+                                if (!animatingCables.isEmpty()) {
+                                    return;
+                                }
                                 Cable cable = (Cable) mEvent.getSource();
                                 if (removeBtn.isSelected()) {
                                     cablesTable.get(cable.getBegin()).put(cable.getEnd(), null);
                                     cablesTable.get(cable.getEnd()).put(cable.getBegin(), null);
                                     desk.getChildren().remove(cable);
-                                } else if (mEvent.getClickCount() == 2 && animatingCables.isEmpty()) {
+                                } else if (mEvent.getClickCount() == 2) {
                                     String[] names = new String[]{cable.getBegin(), cable.getEnd()};
                                     Arrays.sort(names);
                                     sizeDialog.setTitle(names[0] + " - " + names[1]);
