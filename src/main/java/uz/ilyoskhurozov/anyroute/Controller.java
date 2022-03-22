@@ -164,6 +164,7 @@ public class Controller {
 
     @FXML
     void clearDesk() {
+        stopAnimation();
         cablesTable.clear();
         desk.getChildren().clear();
         findRouteBtn.setDisable(true);
