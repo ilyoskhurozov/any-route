@@ -21,10 +21,10 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.ilyoskhurozov.anyroute.Controller">
-   <center>
-      <AnchorPane fx:id="desk" onMouseClicked="#mouseClickOnDesk" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-   </center>
-   <right>
+    <center>
+        <AnchorPane fx:id="desk" onMouseClicked="#mouseClickOnDesk" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+    </center>
+    <right>
        <ToolBar orientation="VERTICAL" BorderPane.alignment="BOTTOM_LEFT">
            <opaqueInsets>
                <Insets />
@@ -43,9 +43,9 @@
                        <graphic>
                            <FontIcon iconLiteral="mdi2r-router" iconSize="40" selectionFill="BLACK" />
                        </graphic>
-                  <toggleGroup>
-                     <ToggleGroup fx:id="btns" />
-                  </toggleGroup>
+                       <toggleGroup>
+                           <ToggleGroup fx:id="btns" />
+                       </toggleGroup>
                    </ToggleButton>
                    <ToggleButton fx:id="cableBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="42.0" toggleGroup="$btns">
                        <graphic>
@@ -57,14 +57,14 @@
                    <VBox.margin>
                        <Insets />
                    </VBox.margin>
-                   <ToggleButton fx:id="removeBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="42.0" toggleGroup="$btns">
+                   <ToggleButton fx:id="deleteBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="42.0" toggleGroup="$btns">
                        <graphic>
                            <FontIcon iconLiteral="mdi2c-close-thick" iconSize="40" selectionFill="BLACK" />
                        </graphic>
                    </ToggleButton>
                <Button contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" onAction="#clearDesk">
                   <graphic>
-                     <FontIcon iconLiteral="mdi2d-delete-forever-outline" iconSize="40" selectionFill="BLACK" />
+                      <FontIcon iconLiteral="mdi2d-delete-forever-outline" iconSize="40" selectionFill="BLACK" />
                   </graphic>
                </Button>
                </HBox>
@@ -97,12 +97,12 @@
                        </graphic>
                    </Button>
                    <Button fx:id="stopBtn" contentDisplay="GRAPHIC_ONLY" disable="true" focusTraversable="false" mnemonicParsing="false" onAction="#stopAnimation" prefHeight="50.0" prefWidth="62.0">
-                      <font>
-                         <Font name="JetBrains Mono Medium Nerd Font Complete Mono" size="16.0" />
-                      </font>
-                      <graphic>
-                         <FontIcon iconLiteral="mdi2s-stop-circle-outline" iconSize="40" selectionFill="BLACK" />
-                      </graphic>
+                       <font>
+                           <Font name="JetBrains Mono Medium Nerd Font Complete Mono" size="16.0" />
+                       </font>
+                       <graphic>
+                           <FontIcon iconLiteral="mdi2s-stop-circle-outline" iconSize="40" selectionFill="BLACK" />
+                       </graphic>
                    </Button>
                </HBox>
                <VBox fx:id="resultsPane" prefHeight="143.0" prefWidth="134.0" visible="false">
@@ -139,16 +139,16 @@
                </VBox>
            </VBox>
        </ToolBar>
-   </right>
-   <top>
-       <MenuBar BorderPane.alignment="CENTER">
-           <Menu mnemonicParsing="false" text="Menu">
-            <MenuItem mnemonicParsing="false" onAction="#close" text="Exit">
-               <accelerator>
-                  <KeyCodeCombination alt="DOWN" code="X" control="UP" meta="UP" shift="UP" shortcut="UP" />
-               </accelerator>
-            </MenuItem>
-           </Menu>
+    </right>
+    <top>
+        <MenuBar BorderPane.alignment="CENTER">
+            <Menu mnemonicParsing="false" text="Menu">
+                <MenuItem mnemonicParsing="false" onAction="#close" text="Exit">
+                    <accelerator>
+                        <KeyCodeCombination alt="DOWN" code="X" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+            </Menu>
        </MenuBar>
-   </top>
+    </top>
 </BorderPane>

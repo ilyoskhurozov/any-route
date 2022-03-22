@@ -37,7 +37,7 @@ public class Controller {
     private ToggleButton cableBtn;
 
     @FXML
-    private ToggleButton removeBtn;
+    private ToggleButton deleteBtn;
 
     @FXML
     private ToggleGroup btns;
@@ -92,7 +92,7 @@ public class Controller {
         );
         scene.getAccelerators().put(
                 new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
-                () -> removeBtn.setSelected(true)
+                () -> deleteBtn.setSelected(true)
         );
         scene.getAccelerators().put(
                 new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.CONTROL_ANY),
@@ -152,7 +152,7 @@ public class Controller {
                                     return;
                                 }
                                 Cable cable = (Cable) mEvent.getSource();
-                                if (removeBtn.isSelected()) {
+                                if (deleteBtn.isSelected()) {
                                     cablesTable.get(cable.getBegin()).put(cable.getEnd(), null);
                                     cablesTable.get(cable.getEnd()).put(cable.getBegin(), null);
                                     desk.getChildren().remove(cable);
@@ -171,7 +171,7 @@ public class Controller {
                         desk.setOnMouseMoved(null);
 
                     }
-                } else if (removeBtn.isSelected()) {
+                } else if (deleteBtn.isSelected()) {
                     desk.getChildren().remove(router);
 
                     Set<String> names = cablesTable.remove(routerName).keySet();
