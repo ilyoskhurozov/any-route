@@ -160,7 +160,7 @@ public class Controller {
                                     cablesTable.get(cable.getBegin()).put(cable.getEnd(), null);
                                     cablesTable.get(cable.getEnd()).put(cable.getBegin(), null);
                                     desk.getChildren().remove(cable);
-                                } else if (mEvent.getClickCount() == 2) {
+                                } else if (mEvent.getClickCount() == 2 && currentCable == null) {
                                     String[] names = new String[]{cable.getBegin(), cable.getEnd()};
                                     Arrays.sort(names);
                                     sizeDialog.setTitle(names[0] + " - " + names[1]);
