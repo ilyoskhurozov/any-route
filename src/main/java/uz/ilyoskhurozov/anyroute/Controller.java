@@ -63,7 +63,7 @@ public class Controller {
 
     @FXML
     private void initialize() {
-        algorithms.getItems().addAll("Dijskstra");
+        algorithms.getItems().addAll("Dijskstra", "Floyd");
         algorithms.getSelectionModel().selectFirst();
 
         cablesTable = new LinkedHashMap<>();
@@ -242,8 +242,12 @@ public class Controller {
                             begin.set(System.nanoTime());
                             route = FindRoute.withDijkstra(table, r1, r2);
                             end.set(System.nanoTime());
-                        }
-                        break;
+                        } break;
+                        case "Floyd": {
+                            begin.set(System.nanoTime());
+                            route = FindRoute.withFloyd(table, r1, r2);
+                            end.set(System.nanoTime());
+                        } break;
                     }
 
                     if (route == null) {
