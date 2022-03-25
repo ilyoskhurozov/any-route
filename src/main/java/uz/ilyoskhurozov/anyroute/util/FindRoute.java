@@ -1,13 +1,12 @@
 package uz.ilyoskhurozov.anyroute.util;
 
-import uz.ilyoskhurozov.anyroute.component.Cable;
 import uz.ilyoskhurozov.anyroute.component.Node;
 
 import java.util.*;
 
 public class FindRoute {
 
-    public static List<String> withDijkstra(LinkedHashMap<String, LinkedHashMap<String, Cable>> table, String begin, String end) {
+    public static List<String> withDijkstra(LinkedHashMap<String, LinkedHashMap<String, Integer>> table, String begin, String end) {
         PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparing(Node::getDistance));
         HashMap<String, Node> nodeMap = new HashMap<>();
 
@@ -19,7 +18,7 @@ public class FindRoute {
                 if (dis != null && !nodeMap.containsKey(name)) {
                     Node node = queue.stream().filter(n -> n.getName().equals(name)).findFirst().orElse(null);
 
-                    int disToCheck = curNode.getDistance() + dis.getLength();
+                    int disToCheck = curNode.getDistance() + dis;
                     if (node == null){
                         node = new Node(name, curNode.getName(), disToCheck);
                         queue.add(node);

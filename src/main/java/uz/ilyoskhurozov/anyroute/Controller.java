@@ -236,10 +236,11 @@ public class Controller {
                     String algo = algorithms.getValue();
                     List<String> route = null;
                     AtomicLong begin = new AtomicLong(), end = new AtomicLong();
+                    LinkedHashMap<String, LinkedHashMap<String, Integer>> table = getLengthTable();
                     switch (algo) {
                         case "Dijskstra": {
                             begin.set(System.nanoTime());
-                            route = FindRoute.withDijkstra(cablesTable, r1, r2);
+                            route = FindRoute.withDijkstra(table, r1, r2);
                             end.set(System.nanoTime());
                         }
                         break;
@@ -297,6 +298,20 @@ public class Controller {
                 thread.start();
             }));
         });
+    }
+
+    private LinkedHashMap<String, LinkedHashMap<String, Integer>> getLengthTable() {
+        LinkedHashMap<String, LinkedHashMap<String, Integer>> table = new LinkedHashMap<>();
+
+        cablesTable.forEach((r1, cableMap) -> {
+            LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
+
+            cableMap.forEach((r2, cable) -> map.put(r2, cable != null ? cable.getLength() : null));
+
+            table.put(r1, map);
+        });
+
+        return table;
     }
 
     @FXML
