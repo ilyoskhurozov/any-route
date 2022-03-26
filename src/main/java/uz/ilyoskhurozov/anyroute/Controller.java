@@ -11,7 +11,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import uz.ilyoskhurozov.anyroute.component.Cable;
+import uz.ilyoskhurozov.anyroute.component.Connection;
 import uz.ilyoskhurozov.anyroute.component.Router;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
 
@@ -21,12 +21,11 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class Controller {
     private int r = 0;
-    private LinkedHashMap<String, LinkedHashMap<String, Cable>> cablesTable;
-    private Cable currentCable;
-    private final int DEFAULT_CABLE_LENGTH = 1;
-    private final TextInputDialog sizeDialog = new TextInputDialog();
+    private LinkedHashMap<String, LinkedHashMap<String, Connection>> connectionsTable;
+    private Connection currentConnection;
+    private final TextInputDialog conPropsDialog = new TextInputDialog();
     private final Alert noRouteAlert = new Alert(Alert.AlertType.WARNING);
-    private final ArrayList<Cable> animatingCables = new ArrayList<>();
+    private final ArrayList<Connection> animatingConnections = new ArrayList<>();
 
     @FXML
     private AnchorPane desk;
@@ -66,19 +65,19 @@ public class Controller {
         algorithms.getItems().addAll("Dijskstra", "Floyd");
         algorithms.getSelectionModel().selectFirst();
 
-        cablesTable = new LinkedHashMap<>();
+        connectionsTable = new LinkedHashMap<>();
 
-        sizeDialog.setHeaderText(null);
-        sizeDialog.setContentText(null);
-        sizeDialog.setGraphic(null);
+        conPropsDialog.setHeaderText(null);
+        conPropsDialog.setContentText(null);
+        conPropsDialog.setGraphic(null);
 
-        sizeDialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(Bindings.not(Bindings.createBooleanBinding(() -> {
+        conPropsDialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(Bindings.not(Bindings.createBooleanBinding(() -> {
             try {
-                return Integer.parseInt(sizeDialog.getEditor().getText()) != 0;
+                return Integer.parseInt(conPropsDialog.getEditor().getText()) != 0;
             } catch (NumberFormatException e) {
                 return false;
             }
-        }, sizeDialog.getEditor().textProperty())));
+        }, conPropsDialog.getEditor().textProperty())));
 
         noRouteAlert.setHeaderText(null);
         noRouteAlert.setContentText("Couldn't find route! Make sure to all cables are connected correctly.");
@@ -105,15 +104,15 @@ public class Controller {
     }
 
     private void cancel() {
-        if (currentCable == null) {
+        if (currentConnection == null) {
             Toggle selectedBtn = btns.getSelectedToggle();
             if (selectedBtn != null) {
                 selectedBtn.setSelected(false);
             }
         } else {
-            desk.getChildren().remove(currentCable);
+            desk.getChildren().remove(currentConnection);
             desk.setOnMouseMoved(null);
-            currentCable = null;
+            currentConnection = null;
         }
     }
 
@@ -125,81 +124,81 @@ public class Controller {
             String routerName = router.getName();
             router.setOnMouseClicked(mouseEvent -> {
                 if (cableBtn.isSelected()) {
-                    if (currentCable == null) {
-                        currentCable = new Cable(DEFAULT_CABLE_LENGTH);
-                        desk.getChildren().add(currentCable);
+                    if (currentConnection == null) {
+                        currentConnection = new Connection();
+                        desk.getChildren().add(currentConnection);
 
-                        currentCable.setBegin(router);
-                        currentCable.setEndX(router.getLayoutX() + mouseEvent.getX());
-                        currentCable.setEndY(router.getLayoutY() + mouseEvent.getY());
+                        currentConnection.setBegin(router);
+                        currentConnection.setEndX(router.getLayoutX() + mouseEvent.getX());
+                        currentConnection.setEndY(router.getLayoutY() + mouseEvent.getY());
 
                         desk.setOnMouseMoved(event -> {
-                            currentCable.setEndX(event.getX() + Math.signum(currentCable.getStartX() - currentCable.getEndX()));
-                            currentCable.setEndY(event.getY() + Math.signum(currentCable.getStartY() - currentCable.getEndY()));
+                            currentConnection.setEndX(event.getX() + Math.signum(currentConnection.getStartX() - currentConnection.getEndX()));
+                            currentConnection.setEndY(event.getY() + Math.signum(currentConnection.getStartY() - currentConnection.getEndY()));
                         });
                     } else {
-                        if (cablesTable.get(currentCable.getBegin()).get(routerName) != null) {
+                        if (connectionsTable.get(currentConnection.getBegin()).get(routerName) != null) {
                             return;
                         }
-                        currentCable.setEnd(router);
+                        currentConnection.setEnd(router);
 
-                        if (currentCable.getEndX() == currentCable.getStartX() &&
-                                currentCable.getEndY() == currentCable.getStartY()
+                        if (currentConnection.getEndX() == currentConnection.getStartX() &&
+                                currentConnection.getEndY() == currentConnection.getStartY()
                         ) {
-                            desk.getChildren().remove(currentCable);
+                            desk.getChildren().remove(currentConnection);
                         } else {
-                            cablesTable.get(currentCable.getBegin()).put(currentCable.getEnd(), currentCable);
-                            cablesTable.get(currentCable.getEnd()).put(currentCable.getBegin(), currentCable);
+                            connectionsTable.get(currentConnection.getBegin()).put(currentConnection.getEnd(), currentConnection);
+                            connectionsTable.get(currentConnection.getEnd()).put(currentConnection.getBegin(), currentConnection);
 
-                            currentCable.setOnMouseClicked(mEvent -> {
-                                if (!animatingCables.isEmpty()) {
+                            currentConnection.setOnMouseClicked(mEvent -> {
+                                if (!animatingConnections.isEmpty()) {
                                     return;
                                 }
-                                Cable cable = (Cable) mEvent.getSource();
+                                Connection connection = (Connection) mEvent.getSource();
                                 if (deleteBtn.isSelected()) {
-                                    cablesTable.get(cable.getBegin()).put(cable.getEnd(), null);
-                                    cablesTable.get(cable.getEnd()).put(cable.getBegin(), null);
-                                    desk.getChildren().remove(cable);
-                                } else if (mEvent.getClickCount() == 2 && currentCable == null) {
-                                    String[] names = new String[]{cable.getBegin(), cable.getEnd()};
+                                    connectionsTable.get(connection.getBegin()).put(connection.getEnd(), null);
+                                    connectionsTable.get(connection.getEnd()).put(connection.getBegin(), null);
+                                    desk.getChildren().remove(connection);
+                                } else if (mEvent.getClickCount() == 2 && currentConnection == null) {
+                                    String[] names = new String[]{connection.getBegin(), connection.getEnd()};
                                     Arrays.sort(names);
-                                    sizeDialog.setTitle(names[0] + " - " + names[1]);
-                                    sizeDialog.getEditor().setText(Integer.toString(cable.getLength()));
+                                    conPropsDialog.setTitle(names[0] + " - " + names[1]);
+                                    conPropsDialog.getEditor().setText(Integer.toString(connection.getMetrics()));
 
-                                    sizeDialog.showAndWait().ifPresent(lengthStr -> cable.setLength(Integer.parseInt(lengthStr)));
+                                    conPropsDialog.showAndWait().ifPresent(lengthStr -> connection.setMetrics(Integer.parseInt(lengthStr)));
                                 }
                             });
                         }
 
-                        currentCable = null;
+                        currentConnection = null;
                         desk.setOnMouseMoved(null);
 
                     }
                 } else if (deleteBtn.isSelected()) {
                     desk.getChildren().remove(router);
 
-                    Set<String> names = cablesTable.remove(routerName).keySet();
+                    Set<String> names = connectionsTable.remove(routerName).keySet();
                     names.remove(routerName);
                     names.forEach(name -> {
-                        Cable removedCable = cablesTable.get(name).remove(routerName);
-                        if (removedCable != null) {
-                            desk.getChildren().remove(removedCable);
+                        Connection removedConnection = connectionsTable.get(name).remove(routerName);
+                        if (removedConnection != null) {
+                            desk.getChildren().remove(removedConnection);
                         }
                     });
 
-                    findRouteBtn.setDisable(cablesTable.size() < 2);
+                    findRouteBtn.setDisable(connectionsTable.size() < 2);
                 }
             });
 
             desk.getChildren().add(router);
 
-            cablesTable.put(routerName, new LinkedHashMap<>(cablesTable.size() + 1));
-            cablesTable.keySet().forEach(rName -> {
-                cablesTable.get(rName).put(routerName, null);
-                cablesTable.get(routerName).put(rName, null);
+            connectionsTable.put(routerName, new LinkedHashMap<>(connectionsTable.size() + 1));
+            connectionsTable.keySet().forEach(rName -> {
+                connectionsTable.get(rName).put(routerName, null);
+                connectionsTable.get(routerName).put(rName, null);
             });
 
-            findRouteBtn.setDisable(cablesTable.size() < 2);
+            findRouteBtn.setDisable(connectionsTable.size() < 2);
         }
     }
 
@@ -207,7 +206,7 @@ public class Controller {
     void clearDesk() {
         stopAnimation();
         resultsPane.setVisible(false);
-        cablesTable.clear();
+        connectionsTable.clear();
         desk.getChildren().clear();
         findRouteBtn.setDisable(true);
         r = 0;
@@ -218,7 +217,7 @@ public class Controller {
         ChoiceDialog<String> choiceDialog = new ChoiceDialog<>();
         choiceDialog.setGraphic(null);
         choiceDialog.setHeaderText(null);
-        Set<String> routers = cablesTable.keySet();
+        Set<String> routers = connectionsTable.keySet();
         choiceDialog.getItems().addAll(routers);
         choiceDialog.setTitle("Start");
         choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
@@ -236,7 +235,7 @@ public class Controller {
                     String algo = algorithms.getValue();
                     List<String> route = null;
                     AtomicLong begin = new AtomicLong(), end = new AtomicLong();
-                    LinkedHashMap<String, LinkedHashMap<String, Integer>> table = getLengthTable();
+                    LinkedHashMap<String, LinkedHashMap<String, Integer>> table = getMetricsTable();
                     switch (algo) {
                         case "Dijskstra": {
                             begin.set(System.nanoTime());
@@ -262,10 +261,10 @@ public class Controller {
                             p1 = p2;
                             p2 = route.get(i);
 
-                            Cable cable = cablesTable.get(p1).get(p2);
-                            cable.startSendingPackages(cable.getBegin().equals(p1));
-                            animatingCables.add(cable);
-                            dis.addAndGet(cable.getLength());
+                            Connection connection = connectionsTable.get(p1).get(p2);
+                            connection.startSendingData(connection.getBegin().equals(p1));
+                            animatingConnections.add(connection);
+                            dis.addAndGet(connection.getMetrics());
                         }
                         stopBtn.setDisable(false);
                         Platform.runLater(() -> {
@@ -304,13 +303,13 @@ public class Controller {
         });
     }
 
-    private LinkedHashMap<String, LinkedHashMap<String, Integer>> getLengthTable() {
+    private LinkedHashMap<String, LinkedHashMap<String, Integer>> getMetricsTable() {
         LinkedHashMap<String, LinkedHashMap<String, Integer>> table = new LinkedHashMap<>();
 
-        cablesTable.forEach((r1, cableMap) -> {
+        connectionsTable.forEach((r1, cableMap) -> {
             LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
 
-            cableMap.forEach((r2, cable) -> map.put(r2, cable != null ? cable.getLength() : null));
+            cableMap.forEach((r2, connection) -> map.put(r2, connection != null ? connection.getMetrics() : null));
 
             table.put(r1, map);
         });
@@ -320,8 +319,8 @@ public class Controller {
 
     @FXML
     void stopAnimation() {
-        animatingCables.forEach(Cable::stopSendingPackages);
-        animatingCables.clear();
+        animatingConnections.forEach(Connection::stopSendingData);
+        animatingConnections.clear();
 
         stopBtn.setDisable(true);
     }
