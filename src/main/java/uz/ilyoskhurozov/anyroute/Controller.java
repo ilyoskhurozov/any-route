@@ -128,16 +128,18 @@ public class Controller {
                         currentConnection = new Connection();
                         desk.getChildren().add(currentConnection);
 
-                        currentConnection.setBegin(router);
-                        currentConnection.setEndX(router.getLayoutX() + mouseEvent.getX());
-                        currentConnection.setEndY(router.getLayoutY() + mouseEvent.getY());
+                        currentConnection.setStart(router);
+                        currentConnection.setEndXY(
+                                router.getLayoutX() + mouseEvent.getX(),
+                                router.getLayoutY() + mouseEvent.getY()
+                        );
 
-                        desk.setOnMouseMoved(event -> {
-                            currentConnection.setEndX(event.getX() + Math.signum(currentConnection.getStartX() - currentConnection.getEndX()));
-                            currentConnection.setEndY(event.getY() + Math.signum(currentConnection.getStartY() - currentConnection.getEndY()));
-                        });
+                        desk.setOnMouseMoved(event -> currentConnection.setEndXY(
+                                event.getX() + Math.signum(currentConnection.getStartX() - currentConnection.getEndX()),
+                                event.getY() + Math.signum(currentConnection.getStartY() - currentConnection.getEndY())
+                        ));
                     } else {
-                        if (connectionsTable.get(currentConnection.getBegin()).get(routerName) != null) {
+                        if (connectionsTable.get(currentConnection.getStart()).get(routerName) != null) {
                             return;
                         }
                         currentConnection.setEnd(router);
@@ -147,8 +149,8 @@ public class Controller {
                         ) {
                             desk.getChildren().remove(currentConnection);
                         } else {
-                            connectionsTable.get(currentConnection.getBegin()).put(currentConnection.getEnd(), currentConnection);
-                            connectionsTable.get(currentConnection.getEnd()).put(currentConnection.getBegin(), currentConnection);
+                            connectionsTable.get(currentConnection.getStart()).put(currentConnection.getEnd(), currentConnection);
+                            connectionsTable.get(currentConnection.getEnd()).put(currentConnection.getStart(), currentConnection);
 
                             currentConnection.setOnMouseClicked(mEvent -> {
                                 if (!animatingConnections.isEmpty()) {
@@ -156,11 +158,11 @@ public class Controller {
                                 }
                                 Connection connection = (Connection) mEvent.getSource();
                                 if (deleteBtn.isSelected()) {
-                                    connectionsTable.get(connection.getBegin()).put(connection.getEnd(), null);
-                                    connectionsTable.get(connection.getEnd()).put(connection.getBegin(), null);
+                                    connectionsTable.get(connection.getStart()).put(connection.getEnd(), null);
+                                    connectionsTable.get(connection.getEnd()).put(connection.getStart(), null);
                                     desk.getChildren().remove(connection);
                                 } else if (mEvent.getClickCount() == 2 && currentConnection == null) {
-                                    String[] names = new String[]{connection.getBegin(), connection.getEnd()};
+                                    String[] names = new String[]{connection.getStart(), connection.getEnd()};
                                     Arrays.sort(names);
                                     conPropsDialog.setTitle(names[0] + " - " + names[1]);
                                     conPropsDialog.getEditor().setText(Integer.toString(connection.getMetrics()));
@@ -262,7 +264,7 @@ public class Controller {
                             p2 = route.get(i);
 
                             Connection connection = connectionsTable.get(p1).get(p2);
-                            connection.startSendingData(connection.getBegin().equals(p1));
+                            connection.startSendingData(connection.getStart().equals(p1));
                             animatingConnections.add(connection);
                             dis.addAndGet(connection.getMetrics());
                         }
