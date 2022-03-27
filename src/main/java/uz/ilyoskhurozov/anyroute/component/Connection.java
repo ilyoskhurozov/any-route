@@ -2,6 +2,8 @@ package uz.ilyoskhurozov.anyroute.component;
 
 import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
@@ -37,7 +39,7 @@ public class Connection extends Group {
         label.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
         cables = new ArrayList<>();
         Line cable = new Line();
-        cable.setStrokeWidth(2);
+        cable.setStrokeWidth(1);
         defColor = Color.BLACK;
 
         getChildren().add(cable);
@@ -82,12 +84,83 @@ public class Connection extends Group {
         getChildren().add(label);
     }
 
+    public void setCableCount(int n){
+        while (cables.size() > n) {
+            cables.remove(n);
+        }
+        while (cables.size() < n) {
+            Line cable = new Line();
+            cable.setStrokeWidth(1);
+
+            getChildren().add(cable);
+            cables.add(cable);
+        }
+
+        updateCables();
+        label.toFront();
+    }
+
+    private void updateCables(){
+        DoubleBinding xSign = new DoubleBinding() {
+            {
+                super.bind(startY, endY);
+            }
+
+            @Override
+            protected double computeValue() {
+                return Math.signum(startY.subtract(endY).get());
+            }
+
+            @Override
+            public ObservableList<?> getDependencies() {
+                return FXCollections.observableArrayList(startY, endY);
+            }
+
+            @Override
+            public void dispose() {
+                super.unbind(startY, endY);
+            }
+        };
+        DoubleBinding ySign = new DoubleBinding() {
+            {
+                super.bind(startX, endX);
+            }
+            @Override
+            protected double computeValue() {
+                return -Math.signum(startX.subtract(endX).get());
+            }
+
+            @Override
+            public ObservableList<?> getDependencies() {
+                return FXCollections.observableArrayList(startX, endX);
+            }
+
+            @Override
+            public void dispose() {
+                super.unbind(startX, endX);
+            }
+        };
+
+        double k = 3.0;
+        int n = cables.size();
+        double cur = -k*(n-1)/2.0;
+
+        for (int i = 0; i < n; i++, cur += k) {
+            Line cable = cables.get(i);
+
+            cable.startXProperty().bind(startX.subtract(xSign.multiply(cur)));
+            cable.startYProperty().bind(startY.subtract(ySign.multiply(cur)));
+
+            cable.endXProperty().bind(endX.subtract(xSign.multiply(cur)));
+            cable.endYProperty().bind(endY.subtract(ySign.multiply(cur)));
+        }
+    }
+
     private void setEndCoors(DoubleBinding x, DoubleBinding y) {
         endX = x;
         endY = y;
 
-        cables.get(0).endXProperty().bind(endX);
-        cables.get(0).endYProperty().bind(endY);
+        updateCables();
     }
 
     public String getEnd() {
