@@ -84,9 +84,11 @@ public class Connection extends Group {
         getChildren().add(label);
     }
 
-    public void setCableCount(int n){
+    public void setCableCount(int n) {
         while (cables.size() > n) {
-            cables.remove(n);
+            getChildren().remove(
+                cables.remove(n)
+            );
         }
         while (cables.size() < n) {
             Line cable = new Line();
@@ -100,7 +102,7 @@ public class Connection extends Group {
         label.toFront();
     }
 
-    private void updateCables(){
+    private void updateCables() {
         DoubleBinding xSign = new DoubleBinding() {
             {
                 super.bind(startY, endY);
@@ -125,6 +127,7 @@ public class Connection extends Group {
             {
                 super.bind(startX, endX);
             }
+
             @Override
             protected double computeValue() {
                 return -Math.signum(startX.subtract(endX).get());
@@ -143,7 +146,7 @@ public class Connection extends Group {
 
         double k = 3.0;
         int n = cables.size();
-        double cur = -k*(n-1)/2.0;
+        double cur = -k * (n - 1) / 2.0;
 
         for (int i = 0; i < n; i++, cur += k) {
             Line cable = cables.get(i);
