@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 public class Connection extends Group {
     private int metrics;
+    private float reliability;
     private final Label label;
     private final ArrayList<Line> cables;
     private String start;
@@ -23,19 +24,21 @@ public class Connection extends Group {
     private boolean isSendingData = false;
     private Color defColor;
     private static final int DEFAULT_METRIC = 1;
+    private static final float DEFAULT_RELIABILITY = 0.8f;
     private DoubleBinding startX;
     private DoubleBinding startY;
     private DoubleBinding endX;
     private DoubleBinding endY;
 
-    public Connection(){
-        this(DEFAULT_METRIC);
+    public Connection() {
+        this(DEFAULT_METRIC, DEFAULT_RELIABILITY);
     }
 
-    public Connection(int metrics) {
+    public Connection(int metrics, float reliability) {
         this.metrics = metrics;
+        this.reliability = reliability;
         label = new Label(metrics + "");
-        label.setPadding(new Insets(0, 5, 0 , 5));
+        label.setPadding(new Insets(0, 5, 0, 5));
         label.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
         cables = new ArrayList<>();
         Line cable = new Line();
@@ -235,20 +238,21 @@ public class Connection extends Group {
     }
 
     public void setEndXY(double x, double y) {
-        setEndCoors(
-                new DoubleBinding() {
-                    @Override
-                    protected double computeValue() {
-                        return x;
-                    }
-                },
-                new DoubleBinding() {
-                    @Override
-                    protected double computeValue() {
-                        return y;
-                    }
-                }
-        );
+        cables.get(0).setEndX(x);
+        cables.get(0).setEndY(y);
+
+        endX = new DoubleBinding() {
+            @Override
+            protected double computeValue() {
+                return x;
+            }
+        };
+        endY = new DoubleBinding() {
+            @Override
+            protected double computeValue() {
+                return y;
+            }
+        };
     }
 
     public double getEndX() {
@@ -263,13 +267,18 @@ public class Connection extends Group {
         return metrics;
     }
 
-    public void setMetrics(int metrics) {
+    public float getReliability() {
+        return reliability;
+    }
+
+    public void setProps(int metrics, float reliability) {
         this.metrics = metrics;
+        this.reliability = reliability;
         label.setText(Integer.toString(metrics));
     }
 
     @Override
     public String toString() {
-        return "Cable{"+ metrics +"}";
+        return "Cable{" + metrics + ", " + reliability + "}";
     }
 }

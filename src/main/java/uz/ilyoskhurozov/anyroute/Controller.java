@@ -1,7 +1,6 @@
 package uz.ilyoskhurozov.anyroute;
 
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -13,6 +12,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import uz.ilyoskhurozov.anyroute.component.Connection;
 import uz.ilyoskhurozov.anyroute.component.Router;
+import uz.ilyoskhurozov.anyroute.util.ConPropsDialog;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
 
 import java.util.*;
@@ -23,7 +23,7 @@ public class Controller {
     private int r = 0;
     private LinkedHashMap<String, LinkedHashMap<String, Connection>> connectionsTable;
     private Connection currentConnection;
-    private final TextInputDialog conPropsDialog = new TextInputDialog();
+    private final ConPropsDialog conPropsDialog = new ConPropsDialog();
     private final Alert noRouteAlert = new Alert(Alert.AlertType.WARNING);
     private final ArrayList<Connection> animatingConnections = new ArrayList<>();
 
@@ -66,18 +66,6 @@ public class Controller {
         algorithms.getSelectionModel().selectFirst();
 
         connectionsTable = new LinkedHashMap<>();
-
-        conPropsDialog.setHeaderText(null);
-        conPropsDialog.setContentText(null);
-        conPropsDialog.setGraphic(null);
-
-        conPropsDialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(Bindings.not(Bindings.createBooleanBinding(() -> {
-            try {
-                return Integer.parseInt(conPropsDialog.getEditor().getText()) != 0;
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }, conPropsDialog.getEditor().textProperty())));
 
         noRouteAlert.setHeaderText(null);
         noRouteAlert.setContentText("Couldn't find route! Make sure to all cables are connected correctly.");
@@ -165,9 +153,14 @@ public class Controller {
                                     String[] names = new String[]{connection.getStart(), connection.getEnd()};
                                     Arrays.sort(names);
                                     conPropsDialog.setTitle(names[0] + " - " + names[1]);
-                                    conPropsDialog.getEditor().setText(Integer.toString(connection.getMetrics()));
+                                    conPropsDialog.setProps(connection.getMetrics(), connection.getReliability());
 
-                                    conPropsDialog.showAndWait().ifPresent(lengthStr -> connection.setMetrics(Integer.parseInt(lengthStr)));
+                                    conPropsDialog.showAndWait().ifPresent(
+                                            conProps -> {
+                                                connection.setProps(conProps.metrics, conProps.reliability);
+                                                connection.setCableCount(conProps.count);
+                                            }
+                                    );
                                 }
                             });
                         }
