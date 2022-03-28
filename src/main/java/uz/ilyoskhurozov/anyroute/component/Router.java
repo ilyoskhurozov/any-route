@@ -18,13 +18,21 @@ public class Router extends VBox {
     private final Label label;
     private final FontIcon icon;
 
-    public Router(int number, double x, double y){
+    private float reliability;
+    private static final float DEFAULT_RELIABILITY = 0.8F;
+
+    public Router(int number, double x, double y) {
+        this(number, DEFAULT_RELIABILITY, x, y);
+    }
+
+    public Router(int number, float reliability, double x, double y) {
         icon = new FontIcon("mdi2r-router");
         icon.setIconSize(30);
-        label = new Label("R"+number);
+        label = new Label("R" + number);
         setColor(Color.BLACK);
 
         getChildren().addAll(icon, label);
+        this.reliability = reliability;
 
         setLayoutX(x);
         setLayoutY(y);
@@ -34,25 +42,25 @@ public class Router extends VBox {
         makeDraggable();
     }
 
-    public String getName(){
+    public String getName() {
         return label.getText();
     }
 
-    public DoubleBinding heightProp(){
+    public DoubleBinding heightProp() {
         return heightProperty().subtract(label.heightProperty());
     }
 
-    private void setColor(Color color){
+    private void setColor(Color color) {
         icon.setIconColor(color);
         label.setTextFill(color);
     }
 
-    private void makeHoverable(){
+    private void makeHoverable() {
         setOnMouseEntered(mouseEvent -> setColor(Color.STEELBLUE));
         setOnMouseExited(mouseEvent -> setColor(Color.BLACK));
     }
 
-    private void makeDraggable(){
+    private void makeDraggable() {
         setOnMousePressed(event -> {
             setColor(Color.BLACK);
 
@@ -83,8 +91,16 @@ public class Router extends VBox {
         });
     }
 
+    public float getReliability() {
+        return reliability;
+    }
+
+    public void setProps(float reliability) {
+        this.reliability = reliability;
+    }
+
     @Override
     public String toString() {
-        return "Router{"+label.getText()+"}";
+        return "Router{" + label.getText() + ", "+reliability+"}";
     }
 }

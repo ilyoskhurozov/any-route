@@ -14,6 +14,7 @@ import uz.ilyoskhurozov.anyroute.component.Connection;
 import uz.ilyoskhurozov.anyroute.component.Router;
 import uz.ilyoskhurozov.anyroute.util.ConPropsDialog;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
+import uz.ilyoskhurozov.anyroute.util.RouterPropsDialog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -22,8 +23,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Controller {
     private int r = 0;
     private LinkedHashMap<String, LinkedHashMap<String, Connection>> connectionsTable;
+    private HashMap<String, Router> routersMap;
     private Connection currentConnection;
     private final ConPropsDialog conPropsDialog = new ConPropsDialog();
+    private final RouterPropsDialog routerPropsDialog = new RouterPropsDialog();
     private final Alert noRouteAlert = new Alert(Alert.AlertType.WARNING);
     private final ArrayList<Connection> animatingConnections = new ArrayList<>();
 
@@ -66,6 +69,7 @@ public class Controller {
         algorithms.getSelectionModel().selectFirst();
 
         connectionsTable = new LinkedHashMap<>();
+        routersMap = new LinkedHashMap<>();
 
         noRouteAlert.setHeaderText(null);
         noRouteAlert.setContentText("Couldn't find route! Make sure to all cables are connected correctly.");
@@ -171,6 +175,7 @@ public class Controller {
                     }
                 } else if (deleteBtn.isSelected()) {
                     desk.getChildren().remove(router);
+                    routersMap.remove(routerName);
 
                     Set<String> names = connectionsTable.remove(routerName).keySet();
                     names.remove(routerName);
@@ -182,10 +187,18 @@ public class Controller {
                     });
 
                     findRouteBtn.setDisable(connectionsTable.size() < 2);
+                } else if (mouseEvent.getClickCount() == 2) {
+                    routerPropsDialog.setTitle(routerName);
+                    routerPropsDialog.setProps(router.getReliability());
+
+                    routerPropsDialog.showAndWait().ifPresent(
+                            routerProps -> router.setProps(routerProps.reliability)
+                    );
                 }
             });
 
             desk.getChildren().add(router);
+            routersMap.put(routerName, router);
 
             connectionsTable.put(routerName, new LinkedHashMap<>(connectionsTable.size() + 1));
             connectionsTable.keySet().forEach(rName -> {
