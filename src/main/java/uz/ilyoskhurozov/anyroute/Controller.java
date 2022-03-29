@@ -12,9 +12,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import uz.ilyoskhurozov.anyroute.component.Connection;
 import uz.ilyoskhurozov.anyroute.component.Router;
-import uz.ilyoskhurozov.anyroute.util.ConPropsDialog;
+import uz.ilyoskhurozov.anyroute.component.ConPropsDialog;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
-import uz.ilyoskhurozov.anyroute.util.RouterPropsDialog;
+import uz.ilyoskhurozov.anyroute.component.RouterPropsDialog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;

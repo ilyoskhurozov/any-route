@@ -1,4 +1,4 @@
-package uz.ilyoskhurozov.anyroute.util;
+package uz.ilyoskhurozov.anyroute.component;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -10,22 +10,41 @@ import javafx.scene.text.Font;
 
 import java.util.ArrayList;
 
-public class RouterPropsDialog extends Dialog<RouterPropsDialog.RouterProps> {
-    public static class RouterProps {
+public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
+    public static class ConProps {
+        public final int metrics;
         public final float reliability;
+        public final int count;
 
-        public RouterProps(float reliability){
+        public ConProps(int metrics, float reliability, int count){
+            this.metrics = metrics;
             this.reliability = reliability;
+            this.count = count;
         }
     }
 
+    private final Spinner<Integer> metricsSpinner;
     private final Spinner<String> reliabilitySpinner;
+    private final Spinner<Integer> countSpinner;
 
-    public RouterPropsDialog() {
+    public ConPropsDialog() {
+
         Font font = new Font("JetBrainsMono Nerd Font", 16);
+
+        Label metricsLabel = new Label("Metrics:");
+        metricsLabel.setFont(font);
 
         Label reliabilityLabel = new Label("Reliability:");
         reliabilityLabel.setFont(font);
+
+        Label countLabel = new Label("Count:");
+        reliabilityLabel.setFont(font);
+
+        metricsSpinner = new Spinner<>(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE)
+        );
+        metricsSpinner.setEditable(true);
+        metricsSpinner.getEditor().setFont(font);
 
         ArrayList<String> list = new ArrayList<>();
         for (int i = 1; i < 10000; i++) {
@@ -42,9 +61,19 @@ public class RouterPropsDialog extends Dialog<RouterPropsDialog.RouterProps> {
         reliabilitySpinner.setEditable(true);
         reliabilitySpinner.getEditor().setFont(font);
 
+        countSpinner = new Spinner<>(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 6)
+        );
+        countSpinner.setEditable(true);
+        countSpinner.getEditor().setFont(font);
+
         GridPane gridPane = new GridPane();
+        gridPane.add(metricsLabel, 0, 0);
+        gridPane.add(metricsSpinner, 1, 0);
         gridPane.add(reliabilityLabel, 0, 1);
         gridPane.add(reliabilitySpinner, 1, 1);
+        gridPane.add(countLabel, 0, 2);
+        gridPane.add(countSpinner, 1, 2);
 
         gridPane.setHgap(10);
         gridPane.setVgap(10);
@@ -59,17 +88,21 @@ public class RouterPropsDialog extends Dialog<RouterPropsDialog.RouterProps> {
 
         setResultConverter(buttonType -> {
             if (buttonType == ButtonType.OK) {
-                return new RouterProps(
-                        Float.parseFloat(reliabilitySpinner.getValue())
+                return new ConProps(
+                        metricsSpinner.getValue(),
+                        Float.parseFloat(reliabilitySpinner.getValue()),
+                        countSpinner.getValue()
                 );
             }
             return null;
         });
 
-        setOnShowing(dialogEvent -> Platform.runLater(reliabilitySpinner::requestFocus));
+        setOnShowing(dialogEvent -> Platform.runLater(metricsSpinner::requestFocus));
     }
 
-    public void setProps(float reliability){
+    public void setProps(int metrics, float reliability){
+        metricsSpinner.getValueFactory().setValue(metrics);
+
         int rel = (int) (reliability * 10000), n = 4;
         while (rel % 10 == 0) {
             rel /= 10;
