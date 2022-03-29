@@ -11,6 +11,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 
@@ -84,6 +85,11 @@ public class Connection extends Group {
 
         label.translateXProperty().bind(x);
         label.translateYProperty().bind(y);
+
+        ConTooltip tooltip = new ConTooltip(this);
+        tooltip.setShowDelay(Duration.ONE);
+        label.setTooltip(tooltip);
+
         getChildren().add(label);
     }
 
@@ -103,6 +109,10 @@ public class Connection extends Group {
 
         updateCables();
         label.toFront();
+    }
+
+    public int getCount() {
+        return cables.size();
     }
 
     private void updateCables() {
@@ -222,9 +232,6 @@ public class Connection extends Group {
     }
 
     private void makeHoverable() {
-        label.onMouseEnteredProperty().bind(onMouseEnteredProperty());
-        label.onMouseExitedProperty().bind(onMouseExitedProperty());
-
         setOnMouseEntered(mouseEvent -> setColor(Color.STEELBLUE));
         setOnMouseExited(mouseEvent -> setColor(defColor));
     }
