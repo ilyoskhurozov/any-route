@@ -38,7 +38,7 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
         reliabilityLabel.setFont(font);
 
         Label countLabel = new Label("Count:");
-        reliabilityLabel.setFont(font);
+        countLabel.setFont(font);
 
         metricsSpinner = new Spinner<>(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE)
