@@ -277,6 +277,10 @@ public class Connection extends Group {
         label.setText(Integer.toString(metrics));
     }
 
+    public float getTotalReliability(){
+        return (float) (1-Math.pow(1-reliability, cables.size()));
+    }
+
     @Override
     public String toString() {
         return "Cable{" + metrics + ", " + reliability + "}";
