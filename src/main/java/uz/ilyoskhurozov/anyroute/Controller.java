@@ -13,11 +13,13 @@ import javafx.scene.layout.VBox;
 import uz.ilyoskhurozov.anyroute.component.Connection;
 import uz.ilyoskhurozov.anyroute.component.Router;
 import uz.ilyoskhurozov.anyroute.component.ConPropsDialog;
+import uz.ilyoskhurozov.anyroute.util.CalculateReliability;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
 import uz.ilyoskhurozov.anyroute.component.RouterPropsDialog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 
 public class Controller {
@@ -46,6 +48,9 @@ public class Controller {
     private ToggleGroup btns;
 
     @FXML
+    private ToggleGroup modes;
+
+    @FXML
     private ChoiceBox<String> algorithms;
 
     @FXML
@@ -62,6 +67,9 @@ public class Controller {
 
     @FXML
     private Label distance;
+
+    @FXML
+    private Label reliability;
 
     @FXML
     private void initialize() {
@@ -275,6 +283,13 @@ public class Controller {
                             dis.addAndGet(connection.getMetrics());
                         }
                         stopBtn.setDisable(false);
+                        final float rel;
+                        if (((RadioButton) modes.getSelectedToggle()).getText().equals("Private channel")) {
+                            rel = CalculateReliability.inModeVirtualChannel(route, getRoutersReliabilityMap(), getConnectionsReliabilityMap());
+                        } else {
+                            rel = 0; //TODO calculate in Datagram mode
+                        }
+
                         Platform.runLater(() -> {
                             long t = end.get()-begin.get();
                             long frac = 0;
@@ -298,6 +313,7 @@ public class Controller {
                             }
                             time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
                             distance.setText(dis.get()+"");
+                            reliability.setText(String.format("≈ %.04f", rel));
                         });
                         resultsPane.setVisible(true);
                     }
@@ -323,6 +339,26 @@ public class Controller {
         });
 
         return table;
+    }
+
+    private Map<String, Float> getRoutersReliabilityMap(){
+        return routersMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().getReliability()
+                ));
+    }
+
+    private Map<String, Map<String, Float>> getConnectionsReliabilityMap(){
+        return connectionsTable.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().entrySet().stream()
+                                .collect(Collectors.toMap(
+                                        Map.Entry::getKey,
+                                        e -> e.getValue() == null ? 0 : e.getValue().getTotalReliability()
+                                ))
+                ));
     }
 
     @FXML

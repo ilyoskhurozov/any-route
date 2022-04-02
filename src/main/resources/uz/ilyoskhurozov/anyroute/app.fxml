@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
@@ -79,13 +80,33 @@
                    </font>
                </Label>
                <ChoiceBox fx:id="algorithms" focusTraversable="false" prefWidth="150.0" />
+            <Separator prefHeight="10.0" prefWidth="126.0">
+               <opaqueInsets>
+                  <Insets left="-10.0" right="-10.0" />
+               </opaqueInsets>
+            </Separator>
+            <Label text="Mode:">
+               <font>
+                  <Font name="JetBrains Mono ExtraBold ExtBd Nerd Font Complete Mono" size="18.0" />
+               </font>
+            </Label>
+            <RadioButton focusTraversable="false" mnemonicParsing="false" selected="true" text="Private channel">
+               <font>
+                  <Font name="JetBrains Mono Medium Nerd Font Complete Mono" size="12.0" />
+               </font>
+               <toggleGroup>
+                  <ToggleGroup fx:id="modes" />
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton focusTraversable="false" mnemonicParsing="false" text="Datagram" toggleGroup="$modes">
+               <font>
+                  <Font name="JetBrains Mono Medium Nerd Font Complete Mono" size="12.0" />
+               </font>
+            </RadioButton>
                <Separator prefHeight="10.0" prefWidth="126.0">
                    <opaqueInsets>
                        <Insets left="-10.0" right="-10.0" />
                    </opaqueInsets>
-                   <VBox.margin>
-                       <Insets top="30.0" />
-                   </VBox.margin>
                </Separator>
                <HBox alignment="CENTER" spacing="10.0">
                    <Button fx:id="findRouteBtn" contentDisplay="GRAPHIC_ONLY" disable="true" focusTraversable="false" mnemonicParsing="false" onAction="#findRoute" prefHeight="50.0" prefWidth="62.0">
@@ -136,6 +157,17 @@
                            <Font name="JetBrains Mono Medium Nerd Font Complete Mono" size="14.0" />
                        </font>
                    </Label>
+               <Pane prefHeight="15.0" prefWidth="134.0" />
+               <Label text="Reliability:">
+                  <font>
+                     <Font name="JetBrains Mono Medium Nerd Font Complete Mono" size="14.0" />
+                  </font>
+               </Label>
+               <Label fx:id="reliability">
+                  <font>
+                     <Font name="JetBrains Mono Medium Nerd Font Complete Mono" size="14.0" />
+                  </font>
+               </Label>
                </VBox>
            </VBox>
        </ToolBar>
