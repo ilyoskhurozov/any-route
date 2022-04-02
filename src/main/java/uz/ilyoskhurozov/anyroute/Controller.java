@@ -314,10 +314,10 @@ public class Controller {
     private LinkedHashMap<String, LinkedHashMap<String, Integer>> getMetricsTable() {
         LinkedHashMap<String, LinkedHashMap<String, Integer>> table = new LinkedHashMap<>();
 
-        connectionsTable.forEach((r1, conRow) -> {
+        connectionsTable.forEach((r1, cableMap) -> {
             LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
 
-            conRow.forEach((r2, connection) -> map.put(r2, connection != null ? connection.getMetrics() : null));
+            cableMap.forEach((r2, connection) -> map.put(r2, connection != null ? connection.getMetrics() : null));
 
             table.put(r1, map);
         });
