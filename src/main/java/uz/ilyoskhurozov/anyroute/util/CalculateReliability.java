@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class CalculateReliability {
 
-    public static float inModeVirtualChannel(List<String> route, Map<String, Float> routersRel, Map<String, Map<String, Float>> conRelTable){
+    public static float inModeVirtualChannel(Map<String, Float> routersRel, Map<String, Map<String, Float>> conRelTable, List<String> route){
         float k = 1;
 
         Iterator<String> routeIter = route.iterator();

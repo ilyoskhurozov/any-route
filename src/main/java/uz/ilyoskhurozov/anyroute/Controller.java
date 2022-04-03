@@ -285,7 +285,7 @@ public class Controller {
                         stopBtn.setDisable(false);
                         final float rel;
                         if (((RadioButton) modes.getSelectedToggle()).getText().equals("Private channel")) {
-                            rel = CalculateReliability.inModeVirtualChannel(route, getRoutersReliabilityMap(), getConnectionsReliabilityMap());
+                            rel = CalculateReliability.inModeVirtualChannel(getRoutersReliabilityMap(), getConnectionsReliabilityMap(), route);
                         } else {
                             rel = 0; //TODO calculate in Datagram mode
                         }
