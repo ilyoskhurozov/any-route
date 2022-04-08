@@ -13,10 +13,10 @@ import java.util.ArrayList;
 public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
     public static class ConProps {
         public final int metrics;
-        public final float reliability;
+        public final double reliability;
         public final int count;
 
-        public ConProps(int metrics, float reliability, int count){
+        public ConProps(int metrics, double reliability, int count){
             this.metrics = metrics;
             this.reliability = reliability;
             this.count = count;
@@ -90,7 +90,7 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
             if (buttonType == ButtonType.OK) {
                 return new ConProps(
                         metricsSpinner.getValue(),
-                        Float.parseFloat(reliabilitySpinner.getValue()),
+                        Double.parseDouble(reliabilitySpinner.getValue()),
                         countSpinner.getValue()
                 );
             }
@@ -100,7 +100,7 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
         setOnShowing(dialogEvent -> Platform.runLater(metricsSpinner::requestFocus));
     }
 
-    public void setProps(int metrics, float reliability){
+    public void setProps(int metrics, double reliability){
         metricsSpinner.getValueFactory().setValue(metrics);
 
         int rel = (int) (reliability * 10000), n = 4;

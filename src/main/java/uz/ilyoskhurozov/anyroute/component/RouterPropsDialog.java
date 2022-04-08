@@ -12,9 +12,9 @@ import java.util.ArrayList;
 
 public class RouterPropsDialog extends Dialog<RouterPropsDialog.RouterProps> {
     public static class RouterProps {
-        public final float reliability;
+        public final double reliability;
 
-        public RouterProps(float reliability){
+        public RouterProps(double reliability){
             this.reliability = reliability;
         }
     }
@@ -60,7 +60,7 @@ public class RouterPropsDialog extends Dialog<RouterPropsDialog.RouterProps> {
         setResultConverter(buttonType -> {
             if (buttonType == ButtonType.OK) {
                 return new RouterProps(
-                        Float.parseFloat(reliabilitySpinner.getValue())
+                        Double.parseDouble(reliabilitySpinner.getValue())
                 );
             }
             return null;
@@ -69,7 +69,7 @@ public class RouterPropsDialog extends Dialog<RouterPropsDialog.RouterProps> {
         setOnShowing(dialogEvent -> Platform.runLater(reliabilitySpinner::requestFocus));
     }
 
-    public void setProps(float reliability){
+    public void setProps(double reliability){
         int rel = (int) (reliability * 10000), n = 4;
         while (rel % 10 == 0) {
             rel /= 10;

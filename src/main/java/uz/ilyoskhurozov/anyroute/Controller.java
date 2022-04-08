@@ -283,7 +283,7 @@ public class Controller {
                             dis.addAndGet(connection.getMetrics());
                         }
                         stopBtn.setDisable(false);
-                        final float rel;
+                        final double rel;
                         if (((RadioButton) modes.getSelectedToggle()).getText().equals("Private channel")) {
                             rel = CalculateReliability.inModeVirtualChannel(getRoutersReliabilityMap(), getConnectionsReliabilityMap(), route);
                         } else {
@@ -341,7 +341,7 @@ public class Controller {
         return table;
     }
 
-    private Map<String, Float> getRoutersReliabilityMap(){
+    private Map<String, Double> getRoutersReliabilityMap(){
         return routersMap.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
@@ -349,7 +349,7 @@ public class Controller {
                 ));
     }
 
-    private Map<String, Map<String, Float>> getConnectionsReliabilityMap(){
+    private Map<String, Map<String, Double>> getConnectionsReliabilityMap(){
         return connectionsTable.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,

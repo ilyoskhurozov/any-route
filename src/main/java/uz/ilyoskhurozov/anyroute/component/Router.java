@@ -18,14 +18,14 @@ public class Router extends VBox {
     private final Label label;
     private final FontIcon icon;
 
-    private float reliability;
-    private static final float DEFAULT_RELIABILITY = 0.8F;
+    private double reliability;
+    private static final double DEFAULT_RELIABILITY = 0.8F;
 
     public Router(int number, double x, double y) {
         this(number, DEFAULT_RELIABILITY, x, y);
     }
 
-    public Router(int number, float reliability, double x, double y) {
+    public Router(int number, double reliability, double x, double y) {
         icon = new FontIcon("mdi2r-router");
         icon.setIconSize(30);
         label = new Label("R" + number);
@@ -91,11 +91,11 @@ public class Router extends VBox {
         });
     }
 
-    public float getReliability() {
+    public double getReliability() {
         return reliability;
     }
 
-    public void setProps(float reliability) {
+    public void setProps(double reliability) {
         this.reliability = reliability;
     }
 

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 public class Connection extends Group {
     private int metrics;
-    private float reliability;
+    private double reliability;
     private final Label label;
     private final ArrayList<Line> cables;
     private String start;
@@ -24,7 +24,7 @@ public class Connection extends Group {
     private boolean isSendingData = false;
     private Color defColor;
     private static final int DEFAULT_METRIC = 1;
-    private static final float DEFAULT_RELIABILITY = 0.8f;
+    private static final double DEFAULT_RELIABILITY = 0.8f;
     private DoubleBinding startX;
     private DoubleBinding startY;
     private DoubleBinding endX;
@@ -34,7 +34,7 @@ public class Connection extends Group {
         this(DEFAULT_METRIC, DEFAULT_RELIABILITY);
     }
 
-    public Connection(int metrics, float reliability) {
+    public Connection(int metrics, double reliability) {
         this.metrics = metrics;
         this.reliability = reliability;
         label = new Label(metrics + "");
@@ -267,18 +267,18 @@ public class Connection extends Group {
         return metrics;
     }
 
-    public float getReliability() {
+    public double getReliability() {
         return reliability;
     }
 
-    public void setProps(int metrics, float reliability) {
+    public void setProps(int metrics, double reliability) {
         this.metrics = metrics;
         this.reliability = reliability;
         label.setText(Integer.toString(metrics));
     }
 
-    public float getTotalReliability(){
-        return (float) (1-Math.pow(1-reliability, cables.size()));
+    public double getTotalReliability(){
+        return 1-Math.pow(1-reliability, cables.size());
     }
 
     @Override
