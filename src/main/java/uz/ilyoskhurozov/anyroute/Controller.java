@@ -287,7 +287,7 @@ public class Controller {
                         if (((RadioButton) modes.getSelectedToggle()).getText().equals("Private channel")) {
                             rel = CalculateReliability.inModeVirtualChannel(getRoutersReliabilityMap(), getConnectionsReliabilityMap(), route);
                         } else {
-                            rel = 0; //TODO calculate in Datagram mode
+                            rel = CalculateReliability.inModeDatagram(getRoutersReliabilityMap(), getConnectionsReliabilityMap(), r1, r2);
                         }
 
                         Platform.runLater(() -> {
