@@ -128,7 +128,7 @@ public class Controller {
                         currentConnection = new Connection();
                         desk.getChildren().add(currentConnection);
 
-                        currentConnection.setStart(router);
+                        currentConnection.setSource(router);
                         currentConnection.setEndXY(
                                 router.getLayoutX() + mouseEvent.getX(),
                                 router.getLayoutY() + mouseEvent.getY()
@@ -139,18 +139,18 @@ public class Controller {
                                 event.getY() + Math.signum(currentConnection.getStartY() - currentConnection.getEndY())
                         ));
                     } else {
-                        if (connectionsTable.get(currentConnection.getStart()).get(routerName) != null) {
+                        if (connectionsTable.get(currentConnection.getSource()).get(routerName) != null) {
                             return;
                         }
-                        currentConnection.setEnd(router);
+                        currentConnection.setTarget(router);
 
                         if (currentConnection.getEndX() == currentConnection.getStartX() &&
                                 currentConnection.getEndY() == currentConnection.getStartY()
                         ) {
                             desk.getChildren().remove(currentConnection);
                         } else {
-                            connectionsTable.get(currentConnection.getStart()).put(currentConnection.getEnd(), currentConnection);
-                            connectionsTable.get(currentConnection.getEnd()).put(currentConnection.getStart(), currentConnection);
+                            connectionsTable.get(currentConnection.getSource()).put(currentConnection.getTarget(), currentConnection);
+                            connectionsTable.get(currentConnection.getTarget()).put(currentConnection.getSource(), currentConnection);
 
                             currentConnection.setOnMouseClicked(mEvent -> {
                                 if (!animatingConnections.isEmpty()) {
@@ -158,11 +158,11 @@ public class Controller {
                                 }
                                 Connection connection = (Connection) mEvent.getSource();
                                 if (deleteBtn.isSelected()) {
-                                    connectionsTable.get(connection.getStart()).put(connection.getEnd(), null);
-                                    connectionsTable.get(connection.getEnd()).put(connection.getStart(), null);
+                                    connectionsTable.get(connection.getSource()).put(connection.getTarget(), null);
+                                    connectionsTable.get(connection.getTarget()).put(connection.getSource(), null);
                                     desk.getChildren().remove(connection);
                                 } else if (mEvent.getClickCount() == 2 && currentConnection == null) {
-                                    String[] names = new String[]{connection.getStart(), connection.getEnd()};
+                                    String[] names = new String[]{connection.getSource(), connection.getTarget()};
                                     Arrays.sort(names);
                                     conPropsDialog.setTitle(names[0] + " - " + names[1]);
                                     conPropsDialog.setProps(connection.getMetrics(), connection.getReliability());
@@ -235,14 +235,14 @@ public class Controller {
         choiceDialog.setHeaderText(null);
         Set<String> routers = connectionsTable.keySet();
         choiceDialog.getItems().addAll(routers);
-        choiceDialog.setTitle("Start");
+        choiceDialog.setTitle("Source");
         choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
         choiceDialog.showAndWait().ifPresent(r1 -> {
             stopAnimation();
             resultsPane.setVisible(false);
 
             choiceDialog.getItems().remove(r1);
-            choiceDialog.setTitle("End");
+            choiceDialog.setTitle("Target");
             choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
             choiceDialog.showAndWait().ifPresent(r2 -> Platform.runLater(() -> {
                 Thread thread = new Thread(() -> {
@@ -278,7 +278,7 @@ public class Controller {
                             p2 = route.get(i);
 
                             Connection connection = connectionsTable.get(p1).get(p2);
-                            connection.startSendingData(connection.getStart().equals(p1));
+                            connection.startSendingData(connection.getSource().equals(p1));
                             animatingConnections.add(connection);
                             dis.addAndGet(connection.getMetrics());
                         }

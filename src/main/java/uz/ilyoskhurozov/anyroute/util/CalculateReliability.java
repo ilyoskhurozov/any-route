@@ -23,12 +23,11 @@ public class CalculateReliability {
         return k;
     }
 
-    public static double inModeDatagram(Map<String, Double> routersRel, Map<String, Map<String, Double>> conRelTable, String begin, String end){
+    public static double inModeDatagram(Map<String, Double> routersRel, Map<String, Map<String, Double>> conRelTable, String source, String target){
         List<String> routes = new ArrayList<>();
-        findAllPaths(conRelTable, begin+";-;", begin, begin, end, routes);
+        findAllPaths(conRelTable, source+";-;", source, source, target, routes);
 
         double mid = 1;
-        int k = 0;
         for (String route : routes) {
             String[] arr = route.split(";");
 
@@ -44,16 +43,16 @@ public class CalculateReliability {
             mid *= 1-sub;
         }
 
-        return routersRel.get(begin) * (1 - mid) * routersRel.get(end);
+        return routersRel.get(source) * (1 - mid) * routersRel.get(target);
     }
 
-    private static void findAllPaths(Map<String, Map<String, Double>> conRelTable, String route, String beginR, String curR, String endR, List<String> routes){
-        conRelTable.get(curR).forEach((r, rel) -> {
-            if (rel > 0 && !route.contains(r + ";") && !r.equals(beginR)) {
-                if (r.equals(endR)) {
-                    routes.add(route+endR);
+    private static void findAllPaths(Map<String, Map<String, Double>> conRelTable, String route, String source, String cur, String target, List<String> routes){
+        conRelTable.get(cur).forEach((r, rel) -> {
+            if (rel > 0 && !route.contains(r + ";") && !r.equals(source)) {
+                if (r.equals(target)) {
+                    routes.add(route+target);
                 } else {
-                    findAllPaths(conRelTable, route+r+";-;", beginR, r, endR, routes);
+                    findAllPaths(conRelTable, route+r+";-;", source, r, target, routes);
                 }
             }
         });

@@ -19,12 +19,12 @@ public class Connection extends Group {
     private double reliability;
     private final Label label;
     private final ArrayList<Line> cables;
-    private String start;
-    private String end;
+    private String source;
+    private String target;
     private boolean isSendingData = false;
     private Color defColor;
     private static final int DEFAULT_METRIC = 1;
-    private static final double DEFAULT_RELIABILITY = 0.8f;
+    private static final double DEFAULT_RELIABILITY = 0.9;
     private DoubleBinding startX;
     private DoubleBinding startY;
     private DoubleBinding endX;
@@ -50,8 +50,8 @@ public class Connection extends Group {
         makeHoverable();
     }
 
-    public void setStart(Router router) {
-        start = router.getName();
+    public void setSource(Router router) {
+        source = router.getName();
 
         setStartCoors(
                 router.layoutXProperty().add(router.widthProperty().divide(2.0)),
@@ -67,12 +67,12 @@ public class Connection extends Group {
         cables.get(0).startYProperty().bind(startY);
     }
 
-    public String getStart() {
-        return start;
+    public String getSource() {
+        return source;
     }
 
-    public void setEnd(Router router) {
-        end = router.getName();
+    public void setTarget(Router router) {
+        target = router.getName();
 
         setEndCoors(
                 router.layoutXProperty().add(router.widthProperty().divide(2.0)),
@@ -169,8 +169,8 @@ public class Connection extends Group {
         updateCables();
     }
 
-    public String getEnd() {
-        return end;
+    public String getTarget() {
+        return target;
     }
 
     private void setColor(Color color) {

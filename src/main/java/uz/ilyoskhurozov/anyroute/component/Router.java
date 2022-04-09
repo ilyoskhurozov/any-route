@@ -19,7 +19,7 @@ public class Router extends VBox {
     private final FontIcon icon;
 
     private double reliability;
-    private static final double DEFAULT_RELIABILITY = 0.8F;
+    private static final double DEFAULT_RELIABILITY = 0.9;
 
     public Router(int number, double x, double y) {
         this(number, DEFAULT_RELIABILITY, x, y);
