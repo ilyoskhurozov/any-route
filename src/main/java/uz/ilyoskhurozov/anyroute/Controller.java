@@ -13,13 +13,10 @@ import javafx.scene.layout.VBox;
 import uz.ilyoskhurozov.anyroute.component.ConPropsDialog;
 import uz.ilyoskhurozov.anyroute.component.Connection;
 import uz.ilyoskhurozov.anyroute.component.Router;
-import uz.ilyoskhurozov.anyroute.component.RouterPropsDialog;
-import uz.ilyoskhurozov.anyroute.util.CalculateReliability;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 
 public class Controller {
@@ -28,7 +25,6 @@ public class Controller {
     private HashMap<String, Router> routersMap;
     private Connection currentConnection;
     private final ConPropsDialog conPropsDialog = new ConPropsDialog();
-    private final RouterPropsDialog routerPropsDialog = new RouterPropsDialog();
     private final ArrayList<Connection> animatingConnections = new ArrayList<>();
 
     @FXML
@@ -47,9 +43,6 @@ public class Controller {
     private ToggleGroup toggles;
 
     @FXML
-    private ToggleGroup modes;
-
-    @FXML
     private ChoiceBox<String> algorithms;
 
     @FXML
@@ -66,9 +59,6 @@ public class Controller {
 
     @FXML
     private Label distance;
-
-    @FXML
-    private Label reliability;
 
     @FXML
     private void initialize() {
@@ -163,11 +153,11 @@ public class Controller {
                                     String[] names = new String[]{connection.getSource(), connection.getTarget()};
                                     Arrays.sort(names);
                                     conPropsDialog.setTitle(names[0] + " - " + names[1]);
-                                    conPropsDialog.setProps(connection.getMetrics(), connection.getReliability(), connection.getCableCount());
+                                    conPropsDialog.setProps(connection.getMetrics(), connection.getCableCount());
 
                                     conPropsDialog.showAndWait().ifPresent(
                                             conProps -> {
-                                                connection.setProps(conProps.metrics, conProps.reliability);
+                                                connection.setProps(conProps.metrics);
                                                 connection.setCableCount(conProps.count);
                                             }
                                     );
@@ -196,13 +186,6 @@ public class Controller {
                     connectionsTable.remove(routerName);
 
                     findRouteBtn.setDisable(connectionsTable.size() < 2);
-                } else if (mouseEvent.getClickCount() == 2) {
-                    routerPropsDialog.setTitle(routerName);
-                    routerPropsDialog.setProps(router.getReliability());
-
-                    routerPropsDialog.showAndWait().ifPresent(
-                            routerProps -> router.setProps(routerProps.reliability)
-                    );
                 }
             });
 
@@ -306,12 +289,6 @@ public class Controller {
                             dis.addAndGet(connection.getMetrics());
                         }
                         stopBtn.setDisable(false);
-                        final double rel;
-                        if (((RadioButton) modes.getSelectedToggle()).getText().equals("Private channel")) {
-                            rel = CalculateReliability.inModeVirtualChannel(getRoutersReliabilityMap(), getConnectionsReliabilityMap(!algo.equals("Bellman-Ford")), route);
-                        } else {
-                            rel = CalculateReliability.inModeDatagram(getRoutersReliabilityMap(), getConnectionsReliabilityMap(!algo.equals("Bellman-Ford")), r1, r2);
-                        }
 
                         Platform.runLater(() -> {
                             long t = end.get() - begin.get();
@@ -336,7 +313,6 @@ public class Controller {
                             }
                             time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
                             distance.setText(dis.get() + "");
-                            reliability.setText(String.format("≈ %.04f", rel));
                         });
                         resultsPane.setVisible(true);
                     }
@@ -368,35 +344,6 @@ public class Controller {
         }));
 
         return table;
-    }
-
-    private Map<String, Double> getRoutersReliabilityMap() {
-        return routersMap.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> e.getValue().getReliability()
-                ));
-    }
-
-    private Map<String, Map<String, Double>> getConnectionsReliabilityMap(boolean isUndirected) {
-        Map<String, Map<String, Double>> relMap = new LinkedHashMap<>();
-
-        connectionsTable.forEach((r, cableMap) -> relMap.put(r, new LinkedHashMap<>()));
-
-        connectionsTable.forEach((r1, row) -> row.forEach((r2, con) -> {
-            if (isUndirected){
-                if (con != null) {
-                    relMap.get(r1).put(r2, con.getReliability());
-                    relMap.get(r2).put(r1, con.getReliability());
-                } else {
-                    relMap.get(r1).putIfAbsent(r2, 0.0);
-                }
-            } else {
-                relMap.get(r1).put(r2, con == null ? 0 : con.getReliability());
-            }
-        }));
-
-        return relMap;
     }
 
     @FXML

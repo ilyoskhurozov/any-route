@@ -16,7 +16,6 @@ import java.util.ArrayList;
 
 public class Connection extends Group {
     private int metrics;
-    private double reliability;
     private final Label label;
     private final ArrayList<Line> cables;
     private String source;
@@ -24,19 +23,17 @@ public class Connection extends Group {
     private boolean isSendingData = false;
     private Color defColor;
     private static final int DEFAULT_METRIC = 1;
-    private static final double DEFAULT_RELIABILITY = 0.9;
     private DoubleBinding startX;
     private DoubleBinding startY;
     private DoubleBinding endX;
     private DoubleBinding endY;
 
     public Connection() {
-        this(DEFAULT_METRIC, DEFAULT_RELIABILITY);
+        this(DEFAULT_METRIC);
     }
 
-    public Connection(int metrics, double reliability) {
+    public Connection(int metrics) {
         this.metrics = metrics;
-        this.reliability = reliability;
         label = new Label(metrics + "");
         label.setPadding(new Insets(0, 5, 0, 5));
         label.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
@@ -271,22 +268,14 @@ public class Connection extends Group {
         return metrics;
     }
 
-    public double getReliability() {
-        return reliability;
-    }
 
-    public void setProps(int metrics, double reliability) {
+    public void setProps(int metrics) {
         this.metrics = metrics;
-        this.reliability = reliability;
         label.setText(Integer.toString(metrics));
-    }
-
-    public double getTotalReliability(){
-        return 1-Math.pow(1-reliability, cables.size());
     }
 
     @Override
     public String toString() {
-        return "Cable{" + metrics + ", " + reliability + "}";
+        return "Cable{" + metrics + "}";
     }
 }
