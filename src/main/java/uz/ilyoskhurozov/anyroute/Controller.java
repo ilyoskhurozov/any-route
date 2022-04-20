@@ -193,6 +193,7 @@ public class Controller {
                             desk.getChildren().remove(connection);
                         }
                     });
+                    connectionsTable.remove(routerName);
 
                     findRouteBtn.setDisable(connectionsTable.size() < 2);
                 } else if (mouseEvent.getClickCount() == 2) {
@@ -229,7 +230,7 @@ public class Controller {
         ChoiceDialog<String> choiceDialog = new ChoiceDialog<>();
         choiceDialog.setGraphic(null);
         choiceDialog.setHeaderText(null);
-        Set<String> routers = connectionsTable.keySet();
+        Set<String> routers = routersMap.keySet();
         choiceDialog.getItems().addAll(routers);
         choiceDialog.setTitle("Source");
         choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
