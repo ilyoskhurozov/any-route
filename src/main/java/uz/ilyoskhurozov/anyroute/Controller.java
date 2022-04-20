@@ -10,12 +10,12 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import uz.ilyoskhurozov.anyroute.component.ConPropsDialog;
 import uz.ilyoskhurozov.anyroute.component.Connection;
 import uz.ilyoskhurozov.anyroute.component.Router;
-import uz.ilyoskhurozov.anyroute.component.ConPropsDialog;
+import uz.ilyoskhurozov.anyroute.component.RouterPropsDialog;
 import uz.ilyoskhurozov.anyroute.util.CalculateReliability;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
-import uz.ilyoskhurozov.anyroute.component.RouterPropsDialog;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -29,7 +29,6 @@ public class Controller {
     private Connection currentConnection;
     private final ConPropsDialog conPropsDialog = new ConPropsDialog();
     private final RouterPropsDialog routerPropsDialog = new RouterPropsDialog();
-    private final Alert noRouteAlert = new Alert(Alert.AlertType.WARNING);
     private final ArrayList<Connection> animatingConnections = new ArrayList<>();
 
     @FXML
@@ -45,7 +44,7 @@ public class Controller {
     private ToggleButton deleteBtn;
 
     @FXML
-    private ToggleGroup btns;
+    private ToggleGroup toggles;
 
     @FXML
     private ToggleGroup modes;
@@ -73,17 +72,14 @@ public class Controller {
 
     @FXML
     private void initialize() {
-        algorithms.getItems().addAll("Dijskstra", "Floyd");
+        algorithms.getItems().addAll("Dijskstra", "Floyd", "Bellman-Ford");
         algorithms.getSelectionModel().selectFirst();
 
         connectionsTable = new LinkedHashMap<>();
         routersMap = new LinkedHashMap<>();
-
-        noRouteAlert.setHeaderText(null);
-        noRouteAlert.setContentText("Couldn't find route! Make sure to all cables are connected correctly.");
     }
 
-    public void bindKeys(){
+    public void bindKeys() {
         Scene scene = desk.getScene();
         scene.getAccelerators().put(
                 new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN),
@@ -105,7 +101,7 @@ public class Controller {
 
     private void cancel() {
         if (currentConnection == null) {
-            Toggle selectedBtn = btns.getSelectedToggle();
+            Toggle selectedBtn = toggles.getSelectedToggle();
             if (selectedBtn != null) {
                 selectedBtn.setSelected(false);
             }
@@ -139,7 +135,11 @@ public class Controller {
                                 event.getY() + Math.signum(currentConnection.getStartY() - currentConnection.getEndY())
                         ));
                     } else {
-                        if (connectionsTable.get(currentConnection.getSource()).get(routerName) != null) {
+                        if (
+                                connectionsTable.get(currentConnection.getSource()).get(routerName) != null ||
+                                        connectionsTable.get(routerName).get(currentConnection.getSource()) != null
+                        ) {
+                            //forbid doubling connection
                             return;
                         }
                         currentConnection.setTarget(router);
@@ -150,7 +150,6 @@ public class Controller {
                             desk.getChildren().remove(currentConnection);
                         } else {
                             connectionsTable.get(currentConnection.getSource()).put(currentConnection.getTarget(), currentConnection);
-                            connectionsTable.get(currentConnection.getTarget()).put(currentConnection.getSource(), currentConnection);
 
                             currentConnection.setOnMouseClicked(mEvent -> {
                                 if (!animatingConnections.isEmpty()) {
@@ -159,7 +158,6 @@ public class Controller {
                                 Connection connection = (Connection) mEvent.getSource();
                                 if (deleteBtn.isSelected()) {
                                     connectionsTable.get(connection.getSource()).put(connection.getTarget(), null);
-                                    connectionsTable.get(connection.getTarget()).put(connection.getSource(), null);
                                     desk.getChildren().remove(connection);
                                 } else if (mEvent.getClickCount() == 2 && currentConnection == null) {
                                     String[] names = new String[]{connection.getSource(), connection.getTarget()};
@@ -185,12 +183,14 @@ public class Controller {
                     desk.getChildren().remove(router);
                     routersMap.remove(routerName);
 
-                    Set<String> names = connectionsTable.remove(routerName).keySet();
-                    names.remove(routerName);
-                    names.forEach(name -> {
-                        Connection removedConnection = connectionsTable.get(name).remove(routerName);
-                        if (removedConnection != null) {
-                            desk.getChildren().remove(removedConnection);
+                    routersMap.keySet().forEach(r -> {
+                        Connection connection = connectionsTable.get(r).remove(routerName);
+                        if (connection == null){
+                            connection = connectionsTable.get(routerName).remove(r);
+                        }
+
+                        if (connection != null) {
+                            desk.getChildren().remove(connection);
                         }
                     });
 
@@ -208,11 +208,7 @@ public class Controller {
             desk.getChildren().add(router);
             routersMap.put(routerName, router);
 
-            connectionsTable.put(routerName, new LinkedHashMap<>(connectionsTable.size() + 1));
-            connectionsTable.keySet().forEach(rName -> {
-                connectionsTable.get(rName).put(routerName, null);
-                connectionsTable.get(routerName).put(rName, null);
-            });
+            connectionsTable.put(routerName, new LinkedHashMap<>());
 
             findRouteBtn.setDisable(connectionsTable.size() < 2);
         }
@@ -251,22 +247,45 @@ public class Controller {
                     String algo = algorithms.getValue();
                     List<String> route = null;
                     AtomicLong begin = new AtomicLong(), end = new AtomicLong();
-                    LinkedHashMap<String, LinkedHashMap<String, Integer>> table = getMetricsTable();
-                    switch (algo) {
-                        case "Dijskstra": {
-                            begin.set(System.nanoTime());
-                            route = FindRoute.withDijkstra(table, r1, r2);
-                            end.set(System.nanoTime());
-                        } break;
-                        case "Floyd": {
-                            begin.set(System.nanoTime());
-                            route = FindRoute.withFloyd(table, r1, r2);
-                            end.set(System.nanoTime());
-                        } break;
+
+                    try {
+                        switch (algo) {
+                            case "Dijskstra": {
+                                begin.set(System.nanoTime());
+                                route = FindRoute.withDijkstra(getMetricsTable(true), r1, r2);
+                                end.set(System.nanoTime());
+                            }
+                            break;
+                            case "Floyd": {
+                                begin.set(System.nanoTime());
+                                route = FindRoute.withFloyd(getMetricsTable(true), r1, r2);
+                                end.set(System.nanoTime());
+                            }
+                            break;
+                            case "Bellman-Ford": {
+                                begin.set(System.nanoTime());
+                                route = FindRoute.withBellmanFord(getMetricsTable(false), r1, r2);
+                                end.set(System.nanoTime());
+                            }
+                            break;
+                        }
+                    } catch (RuntimeException e) {
+                        Platform.runLater(() -> {
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setHeaderText(null);
+                            alert.setContentText(e.getMessage());
+                            alert.showAndWait();
+                        });
+                        return;
                     }
 
                     if (route == null) {
-                        Platform.runLater(noRouteAlert::showAndWait);
+                        Platform.runLater(() -> {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setHeaderText(null);
+                            alert.setContentText("Couldn't find route! Make sure to all cables are connected correctly.");
+                            alert.showAndWait();
+                        });
                     } else {
                         String p1;
                         String p2 = route.get(0);
@@ -278,6 +297,9 @@ public class Controller {
                             p2 = route.get(i);
 
                             Connection connection = connectionsTable.get(p1).get(p2);
+                            if (connection == null) {
+                                connection = connectionsTable.get(p2).get(p1);
+                            }
                             connection.startSendingData(connection.getSource().equals(p1));
                             animatingConnections.add(connection);
                             dis.addAndGet(connection.getMetrics());
@@ -285,13 +307,13 @@ public class Controller {
                         stopBtn.setDisable(false);
                         final double rel;
                         if (((RadioButton) modes.getSelectedToggle()).getText().equals("Private channel")) {
-                            rel = CalculateReliability.inModeVirtualChannel(getRoutersReliabilityMap(), getConnectionsReliabilityMap(), route);
+                            rel = CalculateReliability.inModeVirtualChannel(getRoutersReliabilityMap(), getConnectionsReliabilityMap(!algo.equals("Bellman-Ford")), route);
                         } else {
-                            rel = CalculateReliability.inModeDatagram(getRoutersReliabilityMap(), getConnectionsReliabilityMap(), r1, r2);
+                            rel = CalculateReliability.inModeDatagram(getRoutersReliabilityMap(), getConnectionsReliabilityMap(!algo.equals("Bellman-Ford")), r1, r2);
                         }
 
                         Platform.runLater(() -> {
-                            long t = end.get()-begin.get();
+                            long t = end.get() - begin.get();
                             long frac = 0;
                             String unit = "ns";
                             if (t > 1000) {
@@ -312,7 +334,7 @@ public class Controller {
                                 }
                             }
                             time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
-                            distance.setText(dis.get()+"");
+                            distance.setText(dis.get() + "");
                             reliability.setText(String.format("≈ %.04f", rel));
                         });
                         resultsPane.setVisible(true);
@@ -327,21 +349,27 @@ public class Controller {
         });
     }
 
-    private LinkedHashMap<String, LinkedHashMap<String, Integer>> getMetricsTable() {
+    private LinkedHashMap<String, LinkedHashMap<String, Integer>> getMetricsTable(boolean isUndirected) {
         LinkedHashMap<String, LinkedHashMap<String, Integer>> table = new LinkedHashMap<>();
 
-        connectionsTable.forEach((r1, cableMap) -> {
-            LinkedHashMap<String, Integer> map = new LinkedHashMap<>();
+        connectionsTable.forEach((r, cableMap) -> table.put(r, new LinkedHashMap<>()));
 
-            cableMap.forEach((r2, connection) -> map.put(r2, connection != null ? connection.getMetrics() : null));
+        connectionsTable.forEach((r1, row) -> row.forEach((r2, con) -> {
+            if (con != null) {
 
-            table.put(r1, map);
-        });
+                table.get(r1).put(r2, con.getMetrics());
+
+                if (isUndirected) {
+                    if (con.getMetrics() < 0) throw new IllegalArgumentException("Negative metrics on undirected connection");
+                    table.get(r2).put(r1, con.getMetrics());
+                }
+            }
+        }));
 
         return table;
     }
 
-    private Map<String, Double> getRoutersReliabilityMap(){
+    private Map<String, Double> getRoutersReliabilityMap() {
         return routersMap.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
@@ -349,16 +377,25 @@ public class Controller {
                 ));
     }
 
-    private Map<String, Map<String, Double>> getConnectionsReliabilityMap(){
-        return connectionsTable.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().entrySet().stream()
-                                .collect(Collectors.toMap(
-                                        Map.Entry::getKey,
-                                        e -> e.getValue() == null ? 0 : e.getValue().getTotalReliability()
-                                ))
-                ));
+    private Map<String, Map<String, Double>> getConnectionsReliabilityMap(boolean isUndirected) {
+        Map<String, Map<String, Double>> relMap = new LinkedHashMap<>();
+
+        connectionsTable.forEach((r, cableMap) -> relMap.put(r, new LinkedHashMap<>()));
+
+        connectionsTable.forEach((r1, row) -> row.forEach((r2, con) -> {
+            if (isUndirected){
+                if (con != null) {
+                    relMap.get(r1).put(r2, con.getReliability());
+                    relMap.get(r2).put(r1, con.getReliability());
+                } else {
+                    relMap.get(r1).putIfAbsent(r2, 0.0);
+                }
+            } else {
+                relMap.get(r1).put(r2, con == null ? 0 : con.getReliability());
+            }
+        }));
+
+        return relMap;
     }
 
     @FXML

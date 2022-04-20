@@ -118,10 +118,64 @@ public class FindRoute {
             route.addFirst(prev);
             prev = prePrev;
         }
-        route.addFirst(prev);
+        if (table.get(source).get(prev) == null) return null;
+
+        if (!route.contains(prev)) {
+            route.addFirst(prev);
+        }
         route.addFirst(source);
 
         return route;
+    }
+
+    public static List<String> withBellmanFord(LinkedHashMap<String, LinkedHashMap<String, Integer>> table, String source, String target) {
+        HashMap<String, Node> nodes = new HashMap<>();
+
+        final Node[] node = {new Node(source, null, 0), null};
+        nodes.put(source, node[0]);
+
+        //relaxing all edges
+        for (int i = 0; i < table.size() - 1; i++) {
+            AtomicBoolean hasChange = new AtomicBoolean(false);
+            table.forEach((r0, row) -> row.forEach((r1, w) -> {
+                if (w != null && (node[0] = nodes.get(r0)) != null) {
+                    if ((node[1] = nodes.get(r1)) == null) {
+                        nodes.put(r1, new Node(r1, node[0].getName(), node[0].getDistance() + w));
+                        hasChange.set(true);
+                    } else if (node[0].getDistance() + w < node[1].getDistance()) {
+                        nodes.put(r1, new Node(r1, node[0].getName(), node[0].getDistance() + w));
+                        hasChange.set(true);
+                    }
+                }
+            }));
+
+            if (!hasChange.get()) break;
+        }
+
+        //checking if negative cycle exists
+        table.forEach((r0, row) -> row.forEach((r1, w) -> {
+            if (w != null && (node[0] = nodes.get(r0)) != null && (node[1] = nodes.get(r1)) != null) {
+                if (node[0].getDistance() + w < node[1].getDistance()) {
+                    throw new RuntimeException("Negative cycle exists in the give graph");
+                }
+            }
+        }));
+
+        LinkedList<String> route = new LinkedList<>();
+        node[0] = nodes.get(target);
+        node[1] = null;
+
+        while (node[0] != null) {
+            route.addFirst(node[0].getName());
+            node[1] = node[0];
+            node[0] = nodes.get(node[0].getPrevious());
+        }
+
+        if (node[1] != null && node[1].getName().equals(source)) {
+            return route;
+        } else {
+            return null;
+        }
     }
 
 }

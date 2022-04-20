@@ -1,6 +1,7 @@
 package uz.ilyoskhurozov.anyroute.component;
 
 import javafx.application.Platform;
+import javafx.beans.binding.BooleanBinding;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -41,7 +42,7 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
         countLabel.setFont(font);
 
         metricsSpinner = new Spinner<>(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE)
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(Integer.MIN_VALUE, Integer.MAX_VALUE, 1)
         );
         metricsSpinner.setEditable(true);
         metricsSpinner.getEditor().setFont(font);
@@ -85,6 +86,15 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
 
         getDialogPane().setContent(gridPane);
         getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(new BooleanBinding() {
+            {
+                super.bind(metricsSpinner.valueProperty());
+            }
+            @Override
+            protected boolean computeValue() {
+                return metricsSpinner.getValue() == 0;
+            }
+        });
 
         setResultConverter(buttonType -> {
             if (buttonType == ButtonType.OK) {

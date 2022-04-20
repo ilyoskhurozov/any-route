@@ -45,10 +45,10 @@
                            <FontIcon iconLiteral="mdi2r-router" iconSize="40" selectionFill="BLACK" />
                        </graphic>
                        <toggleGroup>
-                           <ToggleGroup fx:id="btns" />
+                           <ToggleGroup fx:id="toggles" />
                        </toggleGroup>
                    </ToggleButton>
-                   <ToggleButton fx:id="cableBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="42.0" toggleGroup="$btns">
+                   <ToggleButton fx:id="cableBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="42.0" toggleGroup="$toggles">
                        <graphic>
                            <FontIcon iconLiteral="mdi2c-cable-data" iconSize="40" selectionFill="BLACK" />
                        </graphic>
@@ -58,7 +58,7 @@
                    <VBox.margin>
                        <Insets />
                    </VBox.margin>
-                   <ToggleButton fx:id="deleteBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="42.0" toggleGroup="$btns">
+                   <ToggleButton fx:id="deleteBtn" contentDisplay="GRAPHIC_ONLY" focusTraversable="false" mnemonicParsing="false" prefHeight="50.0" prefWidth="42.0" toggleGroup="$toggles">
                        <graphic>
                            <FontIcon iconLiteral="mdi2c-close-thick" iconSize="40" selectionFill="BLACK" />
                        </graphic>
