@@ -105,6 +105,10 @@ public class Connection extends Group {
         label.toFront();
     }
 
+    public int getCableCount() {
+        return cables.size();
+    }
+
     private void updateCables() {
         DoubleBinding xSign = new DoubleBinding() {
             {

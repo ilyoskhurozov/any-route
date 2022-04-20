@@ -163,7 +163,7 @@ public class Controller {
                                     String[] names = new String[]{connection.getSource(), connection.getTarget()};
                                     Arrays.sort(names);
                                     conPropsDialog.setTitle(names[0] + " - " + names[1]);
-                                    conPropsDialog.setProps(connection.getMetrics(), connection.getReliability());
+                                    conPropsDialog.setProps(connection.getMetrics(), connection.getReliability(), connection.getCableCount());
 
                                     conPropsDialog.showAndWait().ifPresent(
                                             conProps -> {

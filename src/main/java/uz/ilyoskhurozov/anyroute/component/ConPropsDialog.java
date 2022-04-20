@@ -110,7 +110,7 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
         setOnShowing(dialogEvent -> Platform.runLater(metricsSpinner::requestFocus));
     }
 
-    public void setProps(int metrics, double reliability){
+    public void setProps(int metrics, double reliability, int count){
         metricsSpinner.getValueFactory().setValue(metrics);
 
         int rel = (int) (reliability * 10000), n = 4;
@@ -119,5 +119,6 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
             n--;
         }
         reliabilitySpinner.getValueFactory().setValue(String.format("0.%0"+n+"d", rel));
+        countSpinner.getValueFactory().setValue(count);
     }
 }
