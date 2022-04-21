@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class Controller {
     private int r = 0;
-    private LinkedHashMap<String, LinkedHashMap<String, Connection>> connectionsTable;
-    private HashMap<String, Router> routersMap;
+    private TreeMap<String, TreeMap<String, Connection>> connectionsTable;
+    private TreeMap<String, Router> routersMap;
     private Connection currentConnection;
     private final ConPropsDialog conPropsDialog = new ConPropsDialog();
     private final ArrayList<Connection> animatingConnections = new ArrayList<>();
@@ -65,8 +65,8 @@ public class Controller {
         algorithms.getItems().addAll("Dijskstra", "Floyd", "Bellman-Ford");
         algorithms.getSelectionModel().selectFirst();
 
-        connectionsTable = new LinkedHashMap<>();
-        routersMap = new LinkedHashMap<>();
+        connectionsTable = new TreeMap<>();
+        routersMap = new TreeMap<>();
     }
 
     public void bindKeys() {
@@ -192,7 +192,7 @@ public class Controller {
             desk.getChildren().add(router);
             routersMap.put(routerName, router);
 
-            connectionsTable.put(routerName, new LinkedHashMap<>());
+            connectionsTable.put(routerName, new TreeMap<>());
 
             findRouteBtn.setDisable(connectionsTable.size() < 2);
         }
@@ -326,10 +326,10 @@ public class Controller {
         });
     }
 
-    private LinkedHashMap<String, LinkedHashMap<String, Integer>> getMetricsTable(boolean isUndirected) {
-        LinkedHashMap<String, LinkedHashMap<String, Integer>> table = new LinkedHashMap<>();
+    private TreeMap<String, TreeMap<String, Integer>> getMetricsTable(boolean isUndirected) {
+        TreeMap<String, TreeMap<String, Integer>> table = new TreeMap<>();
 
-        connectionsTable.forEach((r, cableMap) -> table.put(r, new LinkedHashMap<>()));
+        connectionsTable.forEach((r, cableMap) -> table.put(r, new TreeMap<>()));
 
         connectionsTable.forEach((r1, row) -> row.forEach((r2, con) -> {
             if (con != null) {

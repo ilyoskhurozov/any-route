@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FindRoute {
 
-    public static List<String> withDijkstra(LinkedHashMap<String, LinkedHashMap<String, Integer>> table, String source, String target) {
+    public static List<String> withDijkstra(TreeMap<String, TreeMap<String, Integer>> table, String source, String target) {
         PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparing(Node::getDistance));
         HashMap<String, Node> nodeMap = new HashMap<>();
 
@@ -50,13 +50,13 @@ public class FindRoute {
         }
     }
 
-    public static List<String> withFloyd(LinkedHashMap<String, LinkedHashMap<String, Integer>> table, String source, String target) {
+    public static List<String> withFloyd(TreeMap<String, TreeMap<String, Integer>> table, String source, String target) {
         Set<String> routers = table.keySet();
         //initialize prevTable
-        LinkedHashMap<String, LinkedHashMap<String, String>> prevTable = new LinkedHashMap<>();
+        TreeMap<String, TreeMap<String, String>> prevTable = new TreeMap<>();
 
         routers.forEach(r1 -> {
-            LinkedHashMap<String, String> row = new LinkedHashMap<>();
+            TreeMap<String, String> row = new TreeMap<>();
             prevTable.put(r1, row);
             routers.forEach(r2 -> {
                 if (!r1.equals(r2)) {
@@ -128,7 +128,7 @@ public class FindRoute {
         return route;
     }
 
-    public static List<String> withBellmanFord(LinkedHashMap<String, LinkedHashMap<String, Integer>> table, String source, String target) {
+    public static List<String> withBellmanFord(TreeMap<String, TreeMap<String, Integer>> table, String source, String target) {
         HashMap<String, Node> nodes = new HashMap<>();
 
         final Node[] node = {new Node(source, null, 0), null};
