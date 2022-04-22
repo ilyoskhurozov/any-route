@@ -67,47 +67,44 @@ public class FindRoute {
 
         //find routes
         routers.forEach(
-                i -> routers.forEach(
-                        col -> routers.stream().takeWhile(row -> !row.equals(col)).forEach(
-                                row -> {
-                                    Integer d1 = table.get(row).get(i);
-                                    Integer d2 = table.get(i).get(col);
-                                    if (d1 != null && d2 != null) {
-                                        Integer d = d1 + d2;
-                                        Integer cell = table.get(row).get(col);
-                                        if (cell == null || cell > d) {
-                                            table.get(row).put(col, d);
-                                            table.get(col).put(row, d);
-
-                                            prevTable.get(row).put(col, i);
-                                            prevTable.get(col).put(row, i);
-                                        }
-                                    }
-                                }
-                        )
-                )
-        );
-
-        //check shortcuts
-        AtomicBoolean hasChange = new AtomicBoolean();
-        do {
-            hasChange.set(false);
-            routers.forEach(
-                    row -> routers.stream().takeWhile(col -> !col.equals(row)).forEach(
+                i -> {
+                    System.out.println(i);
+                    routers.forEach(
                             col -> {
-                                String prev = prevTable.get(row).get(col);
-                                String prePrev = prevTable.get(row).get(prev);
-                                String reverse = prevTable.get(col).get(row);
-
-                                if (!prev.equals(prePrev) && !prev.equals(reverse)) {
-                                    hasChange.set(true);
-                                    prevTable.get(row).put(col, prePrev);
-                                    prevTable.get(col).put(row, prePrev);
+                                System.out.println(i+":"+col);
+                                Integer dx = table.get(i).get(col);
+                                if (dx == null) {
+                                    System.out.println("/");
+                                    return;
                                 }
+
+                                routers.stream().takeWhile(row -> !row.equals(col)).forEach(
+                                        row -> {
+                                            System.out.println(i+":"+col+":"+row);
+                                            Integer dy = table.get(row).get(i);
+
+                                            if (dy != null) {
+                                                Integer d = dy + dx;
+                                                Integer cell = table.get(row).get(col);
+                                                if (cell == null || cell > d) {
+                                                    table.get(row).put(col, d);
+                                                    table.get(col).put(row, d);
+
+                                                    String pCol = prevTable.get(i).get(col);
+                                                    if (pCol.equals(col)) pCol = i;
+
+                                                    String pRow = prevTable.get(row).get(i);
+
+                                                    prevTable.get(row).put(col, pCol);
+                                                    prevTable.get(col).put(row, pRow);
+                                                }
+                                            }
+                                        }
+                                );
                             }
-                    )
-            );
-        } while (hasChange.get());
+                    );
+                }
+        );
 
         //assemble route
         LinkedList<String> route = new LinkedList<>();
