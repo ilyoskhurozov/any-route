@@ -215,6 +215,12 @@ public class Connection extends Group {
 
     public void stopSendingData() {
         isSendingData = false;
+        cables.forEach(cable -> cable.getStrokeDashArray().clear());
+        setDefColor(Color.BLACK);
+    }
+
+    public boolean isSendingData() {
+        return isSendingData;
     }
 
     private void setDefColor(Color color) {

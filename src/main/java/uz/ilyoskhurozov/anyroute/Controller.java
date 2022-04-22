@@ -25,7 +25,6 @@ public class Controller {
     private TreeMap<String, Router> routersMap;
     private Connection currentConnection;
     private final ConPropsDialog conPropsDialog = new ConPropsDialog();
-    private final ArrayList<Connection> animatingConnections = new ArrayList<>();
 
     @FXML
     private AnchorPane desk;
@@ -82,6 +81,10 @@ public class Controller {
         scene.getAccelerators().put(
                 new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
                 () -> deleteBtn.setSelected(true)
+        );
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),
+                this::findRoute
         );
         scene.getAccelerators().put(
                 new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.CONTROL_ANY),
@@ -142,10 +145,10 @@ public class Controller {
                             connectionsTable.get(currentConnection.getSource()).put(currentConnection.getTarget(), currentConnection);
 
                             currentConnection.setOnMouseClicked(mEvent -> {
-                                if (!animatingConnections.isEmpty()) {
+                                Connection connection = (Connection) mEvent.getSource();
+                                if (connection.isSendingData()) {
                                     return;
                                 }
-                                Connection connection = (Connection) mEvent.getSource();
                                 if (deleteBtn.isSelected()) {
                                     connectionsTable.get(connection.getSource()).put(connection.getTarget(), null);
                                     desk.getChildren().remove(connection);
@@ -285,7 +288,6 @@ public class Controller {
                                 connection = connectionsTable.get(p2).get(p1);
                             }
                             connection.startSendingData(connection.getSource().equals(p1));
-                            animatingConnections.add(connection);
                             dis.addAndGet(connection.getMetrics());
                         }
                         stopBtn.setDisable(false);
@@ -348,8 +350,11 @@ public class Controller {
 
     @FXML
     void stopAnimation() {
-        animatingConnections.forEach(Connection::stopSendingData);
-        animatingConnections.clear();
+        desk.getChildren()
+                .parallelStream()
+                .filter(node -> node instanceof Connection)
+                .map(node -> (Connection) node)
+                .forEach(Connection::stopSendingData);
 
         stopBtn.setDisable(true);
     }
