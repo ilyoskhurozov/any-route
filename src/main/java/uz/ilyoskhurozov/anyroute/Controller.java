@@ -26,6 +26,7 @@ public class Controller {
     private TreeMap<String, Router> routersMap;
     private Connection currentConnection;
     private final ConPropsDialog conPropsDialog = new ConPropsDialog();
+    private final Map<String, Map<String, Object>> topologyCache = new HashMap<>();
 
     @FXML
     private AnchorPane desk;
@@ -67,43 +68,6 @@ public class Controller {
 
         connectionsTable = new TreeMap<>();
         routersMap = new TreeMap<>();
-    }
-
-    public void bindKeys() {
-        Scene scene = desk.getScene();
-        scene.getAccelerators().put(
-                new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN),
-                () -> routerBtn.setSelected(true)
-        );
-        scene.getAccelerators().put(
-                new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN),
-                () -> cableBtn.setSelected(true)
-        );
-        scene.getAccelerators().put(
-                new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
-                () -> deleteBtn.setSelected(true)
-        );
-        scene.getAccelerators().put(
-                new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),
-                this::findRoute
-        );
-        scene.getAccelerators().put(
-                new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.CONTROL_ANY),
-                this::cancel
-        );
-    }
-
-    private void cancel() {
-        if (currentConnection == null) {
-            Toggle selectedBtn = toggles.getSelectedToggle();
-            if (selectedBtn != null) {
-                selectedBtn.setSelected(false);
-            }
-        } else {
-            desk.getChildren().remove(currentConnection);
-            desk.setOnMouseMoved(null);
-            currentConnection = null;
-        }
     }
 
     @FXML
@@ -258,22 +222,12 @@ public class Controller {
                             break;
                         }
                     } catch (RuntimeException e) {
-                        Platform.runLater(() -> {
-                            Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setHeaderText(null);
-                            alert.setContentText(e.getMessage());
-                            alert.showAndWait();
-                        });
+                        showModal(Alert.AlertType.ERROR, e.getMessage());
                         return;
                     }
 
                     if (route == null) {
-                        Platform.runLater(() -> {
-                            Alert alert = new Alert(Alert.AlertType.WARNING);
-                            alert.setHeaderText(null);
-                            alert.setContentText("Couldn't find route! Make sure to all cables are connected correctly.");
-                            alert.showAndWait();
-                        });
+                        showModal(Alert.AlertType.WARNING, "Couldn't find route! Make sure to all cables are connected correctly.");
                     } else {
                         String p1;
                         String p2 = route.get(0);
@@ -329,26 +283,6 @@ public class Controller {
         });
     }
 
-    private TreeMap<String, TreeMap<String, Integer>> getMetricsTable(boolean isUndirected) {
-        TreeMap<String, TreeMap<String, Integer>> table = new TreeMap<>();
-
-        connectionsTable.forEach((r, cableMap) -> table.put(r, new TreeMap<>()));
-
-        connectionsTable.forEach((r1, row) -> row.forEach((r2, con) -> {
-            if (con != null) {
-
-                table.get(r1).put(r2, con.getMetrics());
-
-                if (isUndirected) {
-                    if (con.getMetrics() < 0) throw new IllegalArgumentException("Negative metrics on undirected connection");
-                    table.get(r2).put(r1, con.getMetrics());
-                }
-            }
-        }));
-
-        return table;
-    }
-
     @FXML
     void stopAnimation() {
         desk.getChildren()
@@ -375,18 +309,126 @@ public class Controller {
     @FXML
     void saveTopology() {
         if (routersMap.size() < 3) return;
-        Optional<Map<String, String>> stringStringMap = new SaveTopologyDialog(routersMap.keySet(), 1).showAndWait();
-        stringStringMap.ifPresent(System.out::println);
-        //TODO save data to cache
+        Optional<Map<String, String>> stringStringMap = new SaveTopologyDialog(routersMap.keySet(), topologyCache.size()).showAndWait();
+        stringStringMap.ifPresent(map -> {
+            String name = map.get("name");
+            String source = map.get("source");
+            String target = map.get("target");
+            List<String> route = FindRoute.withDijkstra(getMetricsTable(true), source, target);
+
+            if (route == null) {
+                showModal(Alert.AlertType.WARNING, "Couldn't find route! Make sure to all cables are connected correctly.");
+                return;
+            }
+
+            if (topologyCache.containsKey(name)){
+                showModal(Alert.AlertType.ERROR, "There is topology with a name " + name);
+                return;
+            }
+
+            topologyCache.put(
+                    name,
+                    Map.of(
+                            "source", source,
+                            "target", target,
+                            "isConnectedTable", getIsConnectedTable()
+                    )
+            );
+            clearDesk();
+        });
     }
 
     @FXML
     void clearCache() {
-
+        topologyCache.clear();
     }
 
     @FXML
     void close() {
         Platform.exit();
+    }
+
+    //helper methods
+
+    public void bindKeys() {
+        Scene scene = desk.getScene();
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN),
+                () -> routerBtn.setSelected(true)
+        );
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN),
+                () -> cableBtn.setSelected(true)
+        );
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
+                () -> deleteBtn.setSelected(true)
+        );
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),
+                this::findRoute
+        );
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.CONTROL_ANY),
+                this::cancel
+        );
+    }
+
+    private void cancel() {
+        if (currentConnection == null) {
+            Toggle selectedBtn = toggles.getSelectedToggle();
+            if (selectedBtn != null) {
+                selectedBtn.setSelected(false);
+            }
+        } else {
+            desk.getChildren().remove(currentConnection);
+            desk.setOnMouseMoved(null);
+            currentConnection = null;
+        }
+    }
+
+    private TreeMap<String, TreeMap<String, Integer>> getMetricsTable(boolean isUndirected) {
+        TreeMap<String, TreeMap<String, Integer>> table = new TreeMap<>();
+
+        connectionsTable.forEach((r, cableMap) -> table.put(r, new TreeMap<>()));
+
+        connectionsTable.forEach((r1, row) -> row.forEach((r2, con) -> {
+            if (con != null) {
+
+                table.get(r1).put(r2, con.getMetrics());
+
+                if (isUndirected) {
+                    if (con.getMetrics() < 0) throw new IllegalArgumentException("Negative metrics on undirected connection");
+                    table.get(r2).put(r1, con.getMetrics());
+                }
+            }
+        }));
+
+        return table;
+    }
+
+    private Map<String, Map<String, Boolean>> getIsConnectedTable() {
+        Map<String, Map<String, Boolean>> map = new TreeMap<>();
+        Set<String> routerNames = routersMap.keySet();
+
+        connectionsTable.forEach((r, cableMap) -> map.put(r, new TreeMap<>()));
+        connectionsTable.forEach((r1, row) -> {
+            row.forEach((r2, con) -> {
+                map.get(r1).put(r2, true);
+                map.get(r2).put(r1, true);
+            });
+            routerNames.forEach(r2 -> map.get(r1).putIfAbsent(r2, false));
+        });
+
+        return map;
+    }
+
+    private void showModal(Alert.AlertType type, String msg){
+        Platform.runLater(() -> {
+            Alert alert = new Alert(type);
+            alert.setHeaderText(null);
+            alert.setContentText(msg);
+            alert.showAndWait();
+        });
     }
 }
