@@ -7,7 +7,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
@@ -141,6 +140,12 @@
     <top>
         <MenuBar BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Menu">
+                <Menu mnemonicParsing="false" text="Reliability graph">
+                    <MenuItem mnemonicParsing="false" onAction="#graphByTopology" text="By topologies in cache"/>
+                    <MenuItem mnemonicParsing="false" onAction="#graphByCableCount" text="By cable count"/>
+                </Menu>
+            <MenuItem mnemonicParsing="false" onAction="#saveTopology" text="Save topology to cache" />
+            <MenuItem mnemonicParsing="false" onAction="#clearCache" text="Clear cache" />
                 <MenuItem mnemonicParsing="false" onAction="#close" text="Exit">
                     <accelerator>
                         <KeyCodeCombination alt="DOWN" code="X" control="UP" meta="UP" shift="UP" shortcut="UP" />

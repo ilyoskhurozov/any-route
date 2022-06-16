@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import uz.ilyoskhurozov.anyroute.component.ConPropsDialog;
 import uz.ilyoskhurozov.anyroute.component.Connection;
 import uz.ilyoskhurozov.anyroute.component.Router;
+import uz.ilyoskhurozov.anyroute.component.SaveTopologyDialog;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
 
 import java.util.*;
@@ -360,6 +361,29 @@ public class Controller {
     }
 
     //Menus
+
+    @FXML
+    void graphByTopology() {
+
+    }
+
+    @FXML
+    void graphByCableCount() {
+
+    }
+
+    @FXML
+    void saveTopology() {
+        if (routersMap.size() < 3) return;
+        Optional<Map<String, String>> stringStringMap = new SaveTopologyDialog(routersMap.keySet(), 1).showAndWait();
+        stringStringMap.ifPresent(System.out::println);
+        //TODO save data to cache
+    }
+
+    @FXML
+    void clearCache() {
+
+    }
 
     @FXML
     void close() {
