@@ -15,6 +15,8 @@ import uz.ilyoskhurozov.anyroute.component.Connection;
 import uz.ilyoskhurozov.anyroute.component.Router;
 import uz.ilyoskhurozov.anyroute.component.SaveTopologyDialog;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
+import uz.ilyoskhurozov.anyroute.util.ReliabilityGraphData;
+import uz.ilyoskhurozov.anyroute.util.TopologyData;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -26,7 +28,7 @@ public class Controller {
     private TreeMap<String, Router> routersMap;
     private Connection currentConnection;
     private final ConPropsDialog conPropsDialog = new ConPropsDialog();
-    private final Map<String, Map<String, Object>> topologyCache = new HashMap<>();
+    private final List<TopologyData> topologyDataCache = new ArrayList<>();
 
     @FXML
     private AnchorPane desk;
@@ -298,18 +300,20 @@ public class Controller {
 
     @FXML
     void graphByTopology() {
-
+        //TODO dialog & graph
+        ReliabilityGraphData.comparingTopologies(0.999, topologyDataCache);
     }
 
     @FXML
     void graphByCableCount() {
-
+        //TODO dialog & graph
+        ReliabilityGraphData.comparingCableCount(0.999, 1, 3, 5);
     }
 
     @FXML
     void saveTopology() {
         if (routersMap.size() < 3) return;
-        Optional<Map<String, String>> stringStringMap = new SaveTopologyDialog(routersMap.keySet(), topologyCache.size()).showAndWait();
+        Optional<Map<String, String>> stringStringMap = new SaveTopologyDialog(routersMap.keySet(), topologyDataCache.size()).showAndWait();
         stringStringMap.ifPresent(map -> {
             String name = map.get("name");
             String source = map.get("source");
@@ -321,17 +325,17 @@ public class Controller {
                 return;
             }
 
-            if (topologyCache.containsKey(name)){
+            if (topologyDataCache.stream().anyMatch(data -> data.name.equals(name))) {
                 showModal(Alert.AlertType.ERROR, "There is topology with a name " + name);
                 return;
             }
 
-            topologyCache.put(
-                    name,
-                    Map.of(
-                            "source", source,
-                            "target", target,
-                            "isConnectedTable", getIsConnectedTable()
+            topologyDataCache.add(
+                    new TopologyData(
+                            name,
+                            source,
+                            target,
+                            getIsConnectedTable()
                     )
             );
             clearDesk();
@@ -340,7 +344,7 @@ public class Controller {
 
     @FXML
     void clearCache() {
-        topologyCache.clear();
+        topologyDataCache.clear();
     }
 
     @FXML
