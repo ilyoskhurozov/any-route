@@ -7,6 +7,7 @@ import static java.lang.Math.pow;
 
 public class ReliabilityGraphData {
 
+    //from 0.99 to 0.9999 with 0.00099 step
     private static final double[] routerReliabilities = new double[] {
             0.99, 0.99099, 0.99198, 0.99297, 0.99396, 0.99495,
             0.99594, 0.99693, 0.99792, 0.99891, 0.9999,
@@ -14,17 +15,18 @@ public class ReliabilityGraphData {
 
     public static Map<String, double[]> comparingCableCount(
             double connectionReliability,
-            int minCableCountInConnection,
-            int maxCableCountInConnection,
+            int minCableCount,
+            int maxCableCount,
             int routersCountInRoute
     ) {
         Map<String, double[]> chartData = new LinkedHashMap<>();
 
-        for (int i = minCableCountInConnection; i <= maxCableCountInConnection; i++) {
+        for (int i = minCableCount; i <= maxCableCount; i++) {
             double[] row = new double[routerReliabilities.length];
             for (int j = 0; j < routerReliabilities.length; j++) {
                 row[j] = round(calculateFullReliability(
-                        routerReliabilities[j], connectionReliability, i, routersCountInRoute
+                        routerReliabilities[j], connectionReliability,
+                        i, routersCountInRoute
                 ));
             }
 
@@ -45,10 +47,14 @@ public class ReliabilityGraphData {
 
         topologyData.forEach(data -> {
             List<String> routes = new ArrayList<>();
-            findAllRoutes(data.isConnectedTable, data.source+"-", data.source, data.target, routes);
+            findAllRoutes(
+                    data.isConnectedTable, data.source+"-",
+                    data.source, data.target, routes
+            );
 
             List<Integer> routerCountList = routes.parallelStream()
-                    .map(route -> route.split("-").length).collect(Collectors.toList());
+                    .map(route -> route.split("-").length)
+                    .collect(Collectors.toList());
 
             double[] row = new double[routerReliabilities.length];
 
@@ -56,9 +62,17 @@ public class ReliabilityGraphData {
                 double mid = 1;
 
                 for (Integer routerCount : routerCountList) {
-                    mid *= calculateMidReliability(routerReliabilities[i], connectionReliability, routerCount);
+                    mid *= calculateMidReliability(
+                            routerReliabilities[i],
+                            connectionReliability,
+                            routerCount
+                    );
                 }
-                row[i] = round(routerReliabilities[i] * (1-mid) * routerReliabilities[i]);
+                row[i] = round(
+                        routerReliabilities[i]
+                            * (1-mid)
+                            * routerReliabilities[i]
+                );
             }
 
             chartData.put(data.name, row);
@@ -74,7 +88,8 @@ public class ReliabilityGraphData {
             int routersCountInRoute
     ) {
         return 1-pow(
-                1-pow(routerReliability, routersCountInRoute)*pow(connectionReliability,routersCountInRoute-1),
+                1-pow(routerReliability, routersCountInRoute)
+                    * pow(connectionReliability,routersCountInRoute-1),
                 cableCountInConnection
         );
     }
@@ -84,11 +99,12 @@ public class ReliabilityGraphData {
             double connectionReliability,
             int routersCountInRoute
     ) {
-        return 1-pow(routerReliability, routersCountInRoute-2)*pow(connectionReliability,routersCountInRoute-1);
+        return 1-pow(routerReliability, routersCountInRoute-2)
+                * pow(connectionReliability,routersCountInRoute-1);
     }
 
     private static double round(double rel) {
-        double p = 1000_000_000.0; //precision
+        double p = 1000_000_000.0;          //precision
         return Math.round(rel * p) / p;
     }
 
@@ -104,7 +120,10 @@ public class ReliabilityGraphData {
                 if (r.equals(target)) {
                     routes.add(route+target);
                 } else {
-                    findAllRoutes(isConnectedTable, route+r+"-", r, target, routes);
+                    findAllRoutes(
+                            isConnectedTable, route+r+"-",
+                            r, target, routes
+                    );
                 }
             }
         });
