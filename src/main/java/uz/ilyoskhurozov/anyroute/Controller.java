@@ -10,10 +10,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
-import uz.ilyoskhurozov.anyroute.component.ConPropsDialog;
-import uz.ilyoskhurozov.anyroute.component.Connection;
-import uz.ilyoskhurozov.anyroute.component.Router;
-import uz.ilyoskhurozov.anyroute.component.SaveTopologyDialog;
+import uz.ilyoskhurozov.anyroute.component.*;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
 import uz.ilyoskhurozov.anyroute.util.ReliabilityGraphData;
 import uz.ilyoskhurozov.anyroute.util.TopologyData;
@@ -301,13 +298,19 @@ public class Controller {
     @FXML
     void graphByTopology() {
         //TODO dialog & graph
-        ReliabilityGraphData.comparingTopologies(0.999, topologyDataCache);
+        new ComparingGraphView(ReliabilityGraphData.comparingTopologies(0.999, topologyDataCache), new double[] {
+                0.99, 0.99099, 0.99198, 0.99297, 0.99396, 0.99495,
+                0.99594, 0.99693, 0.99792, 0.99891, 0.9999,
+        }).showAndWait();
     }
 
     @FXML
     void graphByCableCount() {
         //TODO dialog & graph
-        ReliabilityGraphData.comparingCableCount(0.999, 1, 3, 5);
+        new ComparingGraphView(ReliabilityGraphData.comparingCableCount(0.999, 1, 3, 5), new double[] {
+                0.99, 0.99099, 0.99198, 0.99297, 0.99396, 0.99495,
+                0.99594, 0.99693, 0.99792, 0.99891, 0.9999,
+        }).showAndWait();
     }
 
     @FXML
