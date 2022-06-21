@@ -59,10 +59,9 @@ public class ComparingGraphView extends Stage {
                 node.setPrefSize(7, 7);
                 node.getStyleClass().addAll("default-color0", "chart-line-symbol", "chart-series-line");
                 node.setUserData(i);
-                node.setOnMouseEntered(e -> {
-                    System.out.println(node.getUserData());
-                    //TODO visible chart data
-                });
+                node.setOnMouseEntered(e -> tableView.getSelectionModel().select(
+                        ((Integer) ((StackPane) e.getTarget()).getUserData())
+                ));
                 data.setNode(node);
                 series.getData().add(data);
             }
