@@ -1,4 +1,4 @@
-package uz.ilyoskhurozov.anyroute.component;
+package uz.ilyoskhurozov.anyroute.component.dialog;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;

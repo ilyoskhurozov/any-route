@@ -11,12 +11,16 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import uz.ilyoskhurozov.anyroute.component.*;
+import uz.ilyoskhurozov.anyroute.component.dialog.ComparingGraphDialog;
+import uz.ilyoskhurozov.anyroute.component.dialog.ConPropsDialog;
+import uz.ilyoskhurozov.anyroute.component.dialog.SaveTopologyDialog;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
 import uz.ilyoskhurozov.anyroute.util.ReliabilityGraphData;
 import uz.ilyoskhurozov.anyroute.util.TopologyData;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 
 public class Controller {
@@ -25,7 +29,7 @@ public class Controller {
     private TreeMap<String, Router> routersMap;
     private Connection currentConnection;
     private final ConPropsDialog conPropsDialog = new ConPropsDialog();
-    private final List<TopologyData> topologyDataCache = new ArrayList<>();
+    private final Map<String, TopologyData> topologyDataCache = new LinkedHashMap<>();
 
     @FXML
     private AnchorPane desk;
@@ -173,6 +177,7 @@ public class Controller {
         desk.getChildren().clear();
         findRouteBtn.setDisable(true);
         r = 0;
+        toggles.getSelectedToggle().setSelected(false);
     }
 
     @FXML
@@ -221,12 +226,12 @@ public class Controller {
                             break;
                         }
                     } catch (RuntimeException e) {
-                        showModal(Alert.AlertType.ERROR, e.getMessage());
+                        showMsgModal(Alert.AlertType.ERROR, e.getMessage());
                         return;
                     }
 
                     if (route == null) {
-                        showModal(Alert.AlertType.WARNING, "Couldn't find route! Make sure to all cables are connected correctly.");
+                        showMsgModal(Alert.AlertType.WARNING, "Couldn't find route! Make sure to all cables are connected correctly.");
                     } else {
                         String p1;
                         String p2 = route.get(0);
@@ -296,21 +301,72 @@ public class Controller {
     //Menus
 
     @FXML
+    @SuppressWarnings("unchecked")
     void graphByTopology() {
-        //TODO dialog & graph
-        new ComparingGraphView(ReliabilityGraphData.comparingTopologies(0.999, topologyDataCache), new double[] {
-                0.99, 0.99099, 0.99198, 0.99297, 0.99396, 0.99495,
-                0.99594, 0.99693, 0.99792, 0.99891, 0.9999,
-        }).showAndWait();
+        if (topologyDataCache.size() < 2) {
+            showMsgModal(
+                    Alert.AlertType.ERROR,
+                    "There aren't enough saved topologies"
+            );
+            return;
+        }
+
+        Optional<Map<String, Object>> dataOpt = new ComparingGraphDialog(
+                topologyDataCache.keySet(), true
+        ).showAndWait();
+
+        if (dataOpt.isEmpty()) return;
+
+        Map<String, Object> data = dataOpt.get();
+
+        double routerRel = ((Integer) data.get("routerRel")) / 1000.0;
+        List<String> topologyNames = (List<String>) data.get("topologies");
+        List<TopologyData> topologies = topologyDataCache.values().stream()
+                .filter(topologyData -> topologyNames.contains(topologyData.name))
+                .collect(Collectors.toList());
+
+        showComparingGraphView(
+                ReliabilityGraphData.comparingTopologies(routerRel, topologies)
+        );
     }
 
     @FXML
     void graphByCableCount() {
-        //TODO dialog & graph
-        new ComparingGraphView(ReliabilityGraphData.comparingCableCount(0.999, 1, 3, 5), new double[] {
-                0.99, 0.99099, 0.99198, 0.99297, 0.99396, 0.99495,
-                0.99594, 0.99693, 0.99792, 0.99891, 0.9999,
-        }).showAndWait();
+        if (routersMap.size() < 2) {
+            showMsgModal(
+                    Alert.AlertType.ERROR,
+                    "There aren't enough routers"
+            );
+            return;
+        }
+
+        Optional<Map<String, Object>> dataOpt = new ComparingGraphDialog(
+                routersMap.keySet(), false
+        ).showAndWait();
+
+        if (dataOpt.isEmpty()) return;
+
+        Map<String, Object> data = dataOpt.get();
+
+        double routerRel = ((Integer) data.get("routerRel")) / 1000.0;
+        String source = ((String) data.get("source"));
+        String target = ((String) data.get("target"));
+        Integer cableCountFrom = ((Integer) data.get("cableCountFrom"));
+        Integer cableCountTo = ((Integer) data.get("cableCountTo"));
+
+        List<String> route = FindRoute.withDijkstra(getMetricsTable(true), source, target);
+
+        if (route == null) {
+            showMsgModal(
+                    Alert.AlertType.WARNING,
+                    "Couldn't find route! Make sure to all cables are connected correctly."
+            );
+            return;
+        }
+
+        showComparingGraphView(ReliabilityGraphData.comparingCableCount(
+                routerRel, cableCountFrom, cableCountTo, route.size()
+        ));
     }
 
     @FXML
@@ -324,16 +380,17 @@ public class Controller {
             List<String> route = FindRoute.withDijkstra(getMetricsTable(true), source, target);
 
             if (route == null) {
-                showModal(Alert.AlertType.WARNING, "Couldn't find route! Make sure to all cables are connected correctly.");
+                showMsgModal(Alert.AlertType.WARNING, "Couldn't find route! Make sure to all cables are connected correctly.");
                 return;
             }
 
-            if (topologyDataCache.stream().anyMatch(data -> data.name.equals(name))) {
-                showModal(Alert.AlertType.ERROR, "There is topology with a name " + name);
+            if (topologyDataCache.containsKey(name)) {
+                showMsgModal(Alert.AlertType.ERROR, "There is topology with a name " + name);
                 return;
             }
 
-            topologyDataCache.add(
+            topologyDataCache.put(
+                    name,
                     new TopologyData(
                             name,
                             source,
@@ -430,12 +487,22 @@ public class Controller {
         return map;
     }
 
-    private void showModal(Alert.AlertType type, String msg){
+    private void showMsgModal(Alert.AlertType type, String msg){
         Platform.runLater(() -> {
             Alert alert = new Alert(type);
             alert.setHeaderText(null);
             alert.setContentText(msg);
             alert.showAndWait();
         });
+    }
+
+    private void showComparingGraphView(Map<String, double[]> chartData) {
+        new ComparingGraphView(
+                chartData,
+                new double[] {
+                        0.99, 0.99099, 0.99198, 0.99297, 0.99396, 0.99495,
+                        0.99594, 0.99693, 0.99792, 0.99891, 0.9999,
+                }
+        ).showAndWait();
     }
 }

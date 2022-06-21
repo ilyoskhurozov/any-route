@@ -1,6 +1,9 @@
 package uz.ilyoskhurozov.anyroute.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.pow;
@@ -15,13 +18,13 @@ public class ReliabilityGraphData {
 
     public static Map<String, double[]> comparingCableCount(
             double connectionReliability,
-            int minCableCount,
-            int maxCableCount,
+            int cableCountFrom,
+            int cableCountTo,
             int routersCountInRoute
     ) {
         Map<String, double[]> chartData = new LinkedHashMap<>();
 
-        for (int i = minCableCount; i <= maxCableCount; i++) {
+        for (int i = cableCountFrom; i <= cableCountTo; i++) {
             double[] row = new double[routerReliabilities.length];
             for (int j = 0; j < routerReliabilities.length; j++) {
                 row[j] = round(calculateFullReliability(
