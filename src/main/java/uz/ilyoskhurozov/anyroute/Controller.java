@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import uz.ilyoskhurozov.anyroute.component.*;
 import uz.ilyoskhurozov.anyroute.component.dialog.ComparingGraphDialog;
 import uz.ilyoskhurozov.anyroute.component.dialog.ConPropsDialog;
+import uz.ilyoskhurozov.anyroute.component.dialog.JustAlert;
 import uz.ilyoskhurozov.anyroute.component.dialog.SaveTopologyDialog;
 import uz.ilyoskhurozov.anyroute.util.FindRoute;
 import uz.ilyoskhurozov.anyroute.util.ReliabilityGraphData;
@@ -226,12 +227,18 @@ public class Controller {
                             break;
                         }
                     } catch (RuntimeException e) {
-                        showMsgModal(Alert.AlertType.ERROR, e.getMessage());
+                        new JustAlert(
+                                Alert.AlertType.ERROR,
+                                e.getMessage()
+                        ).showAndWait();
                         return;
                     }
 
                     if (route == null) {
-                        showMsgModal(Alert.AlertType.WARNING, "Couldn't find route! Make sure to all cables are connected correctly.");
+                        new JustAlert(
+                                Alert.AlertType.WARNING,
+                                "Couldn't find route! Make sure to all cables are connected correctly."
+                        ).showAndWait();
                     } else {
                         String p1;
                         String p2 = route.get(0);
@@ -304,10 +311,10 @@ public class Controller {
     @SuppressWarnings("unchecked")
     void graphByTopology() {
         if (topologyDataCache.size() < 2) {
-            showMsgModal(
+            new JustAlert(
                     Alert.AlertType.ERROR,
                     "There aren't enough saved topologies"
-            );
+            ).showAndWait();
             return;
         }
 
@@ -333,10 +340,10 @@ public class Controller {
     @FXML
     void graphByCableCount() {
         if (routersMap.size() < 2) {
-            showMsgModal(
+            new JustAlert(
                     Alert.AlertType.ERROR,
                     "There aren't enough routers"
-            );
+            ).showAndWait();
             return;
         }
 
@@ -357,10 +364,10 @@ public class Controller {
         List<String> route = FindRoute.withDijkstra(getMetricsTable(true), source, target);
 
         if (route == null) {
-            showMsgModal(
+            new JustAlert(
                     Alert.AlertType.WARNING,
                     "Couldn't find route! Make sure to all cables are connected correctly."
-            );
+            ).showAndWait();
             return;
         }
 
@@ -380,12 +387,18 @@ public class Controller {
             List<String> route = FindRoute.withDijkstra(getMetricsTable(true), source, target);
 
             if (route == null) {
-                showMsgModal(Alert.AlertType.WARNING, "Couldn't find route! Make sure to all cables are connected correctly.");
+                new JustAlert(
+                        Alert.AlertType.WARNING,
+                        "Couldn't find route! Make sure to all cables are connected correctly."
+                ).showAndWait();
                 return;
             }
 
             if (topologyDataCache.containsKey(name)) {
-                showMsgModal(Alert.AlertType.ERROR, "There is topology with a name " + name);
+                new JustAlert(
+                        Alert.AlertType.ERROR,
+                        "There is topology with a name " + name
+                ).showAndWait();
                 return;
             }
 
@@ -485,15 +498,6 @@ public class Controller {
         });
 
         return map;
-    }
-
-    private void showMsgModal(Alert.AlertType type, String msg){
-        Platform.runLater(() -> {
-            Alert alert = new Alert(type);
-            alert.setHeaderText(null);
-            alert.setContentText(msg);
-            alert.showAndWait();
-        });
     }
 
     private void showComparingGraphView(Map<String, double[]> chartData) {
