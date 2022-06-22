@@ -79,7 +79,7 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
             setResultConverter(buttonType -> {
                 if (buttonType == ButtonType.OK) {
                     return Map.of(
-                            "routerRel", routerReliability.getValue(),
+                            "routerRel", routerReliability.getValue() / 10000.0,
                             "topologies", checks.stream()
                                     .filter(CheckBox::isSelected)
                                     .map(CheckBox::getText)
@@ -131,7 +131,7 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
                 if (buttonType == ButtonType.OK) {
                     Map<String, String> st = stPane.getValue();
                     return Map.of(
-                            "routerRel", routerReliability.getValue(),
+                            "routerRel", routerReliability.getValue() / 10000.0,
                             "source", st.get("source"),
                             "target", st.get("target"),
                             "cableCountFrom", ccFromSpinner.getValue(),

@@ -331,7 +331,7 @@ public class Controller {
 
         Map<String, Object> data = dataOpt.get();
 
-        double routerRel = ((Integer) data.get("routerRel")) / 10000.0;
+        double routerRel = ((double) data.get("routerRel"));
         List<String> topologyNames = (List<String>) data.get("topologies");
         List<TopologyData> topologies = topologyDataCache.values().stream()
                 .filter(topologyData -> topologyNames.contains(topologyData.name))
@@ -357,7 +357,7 @@ public class Controller {
 
         Map<String, Object> data = dataOpt.get();
 
-        double routerRel = ((Integer) data.get("routerRel")) / 10000.0;
+        double routerRel = ((double) data.get("routerRel"));
         String source = ((String) data.get("source"));
         String target = ((String) data.get("target"));
         Integer cableCountFrom = ((Integer) data.get("cableCountFrom"));
