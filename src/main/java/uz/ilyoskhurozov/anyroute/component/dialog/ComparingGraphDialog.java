@@ -8,6 +8,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
+import uz.ilyoskhurozov.anyroute.component.SourceTargetPane;
 
 import java.util.List;
 import java.util.Map;
@@ -88,18 +89,11 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
                 return null;
             });
         } else {
-            Label sourceLabel = new Label("Source:");
-            Label targetLabel = new Label("Target:");
             Label ccFromLabel = new Label("Cable count (from):");
             Label ccToLabel = new Label("Cable count (to):");
 
-            ComboBox<String> sourceBox = new ComboBox<>();
-            ComboBox<String> targetBox = new ComboBox<>();
-            sourceBox.getItems().addAll(names);
-
-            sourceBox.setOnAction(actionEvent -> updateTargetBoxItems(targetBox, names, sourceBox.getValue()));
-            sourceBox.getSelectionModel().selectFirst();
-            updateTargetBoxItems(targetBox, names, sourceBox.getValue());
+            SourceTargetPane stPane = new SourceTargetPane(names, font);
+            stPane.getColumnConstraints().addAll(gridPane.getColumnConstraints());
 
             Spinner<Integer> ccFromSpinner = new Spinner<>(
                     new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 5, 1)
@@ -112,25 +106,16 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
             ccToSpinner.setEditable(true);
 
 
-            sourceLabel.setFont(font);
-            targetLabel.setFont(font);
-            sourceLabel.setFont(font);
-            targetLabel.setFont(font);
             ccFromLabel.setFont(font);
             ccToLabel.setFont(font);
-            sourceBox.getEditor().setFont(font);
-            targetBox.getEditor().setFont(font);
             ccFromSpinner.getEditor().setFont(font);
             ccToSpinner.getEditor().setFont(font);
 
-            gridPane.add(sourceLabel, 0, 1);
-            gridPane.add(sourceBox, 1, 1);
-            gridPane.add(targetLabel, 0, 2);
-            gridPane.add(targetBox, 1, 2);
-            gridPane.add(ccFromLabel, 0, 3);
-            gridPane.add(ccFromSpinner, 1, 3);
-            gridPane.add(ccToLabel, 0, 4);
-            gridPane.add(ccToSpinner, 1, 4);
+            gridPane.add(stPane, 0, 1, 2, 1);
+            gridPane.add(ccFromLabel, 0, 2);
+            gridPane.add(ccFromSpinner, 1, 2);
+            gridPane.add(ccToLabel, 0, 3);
+            gridPane.add(ccToSpinner, 1, 3);
 
             getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(new BooleanBinding() {
                 {
@@ -144,10 +129,11 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
 
             setResultConverter(buttonType -> {
                 if (buttonType == ButtonType.OK) {
+                    Map<String, String> st = stPane.getValue();
                     return Map.of(
                             "routerRel", routerReliability.getValue(),
-                            "source", sourceBox.getValue(),
-                            "target", targetBox.getValue(),
+                            "source", st.get("source"),
+                            "target", st.get("target"),
                             "cableCountFrom", ccFromSpinner.getValue(),
                             "cableCountTo", ccToSpinner.getValue()
                     );
@@ -155,12 +141,5 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
                 return null;
             });
         }
-    }
-
-    private void updateTargetBoxItems(ComboBox<String> targetBox, Set<String> items, String exclude) {
-        targetBox.getItems().clear();
-        targetBox.getItems().addAll(items);
-        targetBox.getItems().remove(exclude);
-        targetBox.getSelectionModel().selectFirst();
     }
 }

@@ -9,7 +9,9 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import uz.ilyoskhurozov.anyroute.component.*;
 import uz.ilyoskhurozov.anyroute.component.dialog.ComparingGraphDialog;
 import uz.ilyoskhurozov.anyroute.component.dialog.ConPropsDialog;
@@ -185,110 +187,119 @@ public class Controller {
 
     @FXML
     void findRoute() {
-        ChoiceDialog<String> choiceDialog = new ChoiceDialog<>();
-        choiceDialog.setGraphic(null);
-        choiceDialog.setHeaderText(null);
-        Set<String> routers = routersMap.keySet();
-        choiceDialog.getItems().addAll(routers);
-        choiceDialog.setTitle("Source");
-        choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
-        choiceDialog.showAndWait().ifPresent(r1 -> {
-            stopAnimation();
-            resultsPane.setVisible(false);
+        stopAnimation();
+        resultsPane.setVisible(false);
 
-            choiceDialog.getItems().remove(r1);
-            choiceDialog.setTitle("Target");
-            choiceDialog.setSelectedItem(choiceDialog.getItems().get(0));
-            choiceDialog.showAndWait().ifPresent(r2 -> Platform.runLater(() -> {
-                Thread thread = new Thread(() -> {
-                    findRouteBtn.setDisable(true);
+        Font font = new Font("JetBrainsMono Nerd Font", 16);
 
-                    String algo = algorithms.getValue();
-                    List<String> route = null;
-                    AtomicLong begin = new AtomicLong(), end = new AtomicLong();
+        SourceTargetPane stPane = new SourceTargetPane(routersMap.keySet(), font);
+        stPane.getColumnConstraints().addAll(
+                new ColumnConstraints(100,100,100),
+                new ColumnConstraints(100,100,100)
+        );
 
-                    try {
-                        switch (algo) {
-                            case "Dijskstra": {
-                                begin.set(System.nanoTime());
-                                route = FindRoute.withDijkstra(getMetricsTable(true), r1, r2);
-                                end.set(System.nanoTime());
-                            }
-                            break;
-                            case "Floyd": {
-                                begin.set(System.nanoTime());
-                                route = FindRoute.withFloyd(getMetricsTable(true), r1, r2);
-                                end.set(System.nanoTime());
-                            }
-                            break;
-                            case "Bellman-Ford": {
-                                begin.set(System.nanoTime());
-                                route = FindRoute.withBellmanFord(getMetricsTable(false), r1, r2);
-                                end.set(System.nanoTime());
-                            }
-                            break;
+        Dialog<Map<String, String>> stDialog = new Dialog<>();
+        stDialog.getDialogPane().setContent(stPane);
+        stDialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        stDialog.setResultConverter(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                return stPane.getValue();
+            }
+            return null;
+        });
+
+        stDialog.showAndWait().ifPresent(st -> Platform.runLater(() -> {
+            String r1 = st.get("source");
+            String r2 = st.get("target");
+
+            Thread thread = new Thread(() -> {
+                findRouteBtn.setDisable(true);
+
+                String algo = algorithms.getValue();
+                List<String> route = null;
+                AtomicLong begin = new AtomicLong(), end = new AtomicLong();
+
+                try {
+                    switch (algo) {
+                        case "Dijskstra": {
+                            begin.set(System.nanoTime());
+                            route = FindRoute.withDijkstra(getMetricsTable(true), r1, r2);
+                            end.set(System.nanoTime());
                         }
-                    } catch (RuntimeException e) {
-                        Platform.runLater(() -> new JustAlert(Message.RUNTIME_ERROR).showAndWait());
-                        System.out.println(e.getMessage());
-                        return;
+                        break;
+                        case "Floyd": {
+                            begin.set(System.nanoTime());
+                            route = FindRoute.withFloyd(getMetricsTable(true), r1, r2);
+                            end.set(System.nanoTime());
+                        }
+                        break;
+                        case "Bellman-Ford": {
+                            begin.set(System.nanoTime());
+                            route = FindRoute.withBellmanFord(getMetricsTable(false), r1, r2);
+                            end.set(System.nanoTime());
+                        }
+                        break;
                     }
+                } catch (RuntimeException e) {
+                    Platform.runLater(() -> new JustAlert(Message.RUNTIME_ERROR).showAndWait());
+                    System.out.println(e.getMessage());
+                    return;
+                }
 
-                    if (route == null) {
-                        Platform.runLater(() -> new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait());
-                    } else {
-                        String p1;
-                        String p2 = route.get(0);
+                if (route == null) {
+                    Platform.runLater(() -> new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait());
+                } else {
+                    String p1;
+                    String p2 = route.get(0);
 
-                        AtomicLong dis = new AtomicLong(0);
+                    AtomicLong dis = new AtomicLong(0);
 
-                        for (int i = 1; i < route.size(); i++) {
-                            p1 = p2;
-                            p2 = route.get(i);
+                    for (int i = 1; i < route.size(); i++) {
+                        p1 = p2;
+                        p2 = route.get(i);
 
-                            Connection connection = connectionsTable.get(p1).get(p2);
-                            if (connection == null) {
-                                connection = connectionsTable.get(p2).get(p1);
-                            }
-                            connection.startSendingData(connection.getSource().equals(p1));
-                            dis.addAndGet(connection.getMetrics());
+                        Connection connection = connectionsTable.get(p1).get(p2);
+                        if (connection == null) {
+                            connection = connectionsTable.get(p2).get(p1);
                         }
-                        stopBtn.setDisable(false);
+                        connection.startSendingData(connection.getSource().equals(p1));
+                        dis.addAndGet(connection.getMetrics());
+                    }
+                    stopBtn.setDisable(false);
 
-                        Platform.runLater(() -> {
-                            long t = end.get() - begin.get();
-                            long frac = 0;
-                            String unit = "ns";
+                    Platform.runLater(() -> {
+                        long t = end.get() - begin.get();
+                        long frac = 0;
+                        String unit = "ns";
+                        if (t > 1000) {
+                            frac = t % 1000;
+                            t /= 1000;
+                            unit = "mks";
+
                             if (t > 1000) {
                                 frac = t % 1000;
                                 t /= 1000;
-                                unit = "mks";
+                                unit = "ms";
 
                                 if (t > 1000) {
                                     frac = t % 1000;
                                     t /= 1000;
-                                    unit = "ms";
-
-                                    if (t > 1000) {
-                                        frac = t % 1000;
-                                        t /= 1000;
-                                        unit = "s";
-                                    }
+                                    unit = "s";
                                 }
                             }
-                            time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
-                            distance.setText(dis.get() + "");
-                        });
-                        resultsPane.setVisible(true);
-                    }
+                        }
+                        time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
+                        distance.setText(dis.get() + "");
+                    });
+                    resultsPane.setVisible(true);
+                }
 
-                    findRouteBtn.setDisable(false);
-                });
+                findRouteBtn.setDisable(false);
+            });
 
-                thread.setDaemon(true);
-                thread.start();
-            }));
-        });
+            thread.setDaemon(true);
+            thread.start();
+        }));
     }
 
     @FXML
@@ -334,7 +345,7 @@ public class Controller {
     @FXML
     void graphByCableCount() {
         if (routersMap.size() < 2) {
-            new JustAlert(Message.AT_LEAST_TWO_ROUTER).showAndWait();
+            new JustAlert(Message.AT_LEAST_TWO_ROUTERS).showAndWait();
             return;
         }
 
@@ -367,7 +378,7 @@ public class Controller {
     @FXML
     void saveTopology() {
         if (routersMap.size() < 2) {
-            new JustAlert(Message.AT_LEAST_TWO_ROUTER).showAndWait();
+            new JustAlert(Message.AT_LEAST_TWO_ROUTERS).showAndWait();
             return;
         }
         Optional<Map<String, String>> stringStringMap = new SaveTopologyDialog(routersMap.keySet(), topologyDataCache.size()).showAndWait();
