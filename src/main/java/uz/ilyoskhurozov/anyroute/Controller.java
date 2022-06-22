@@ -229,18 +229,13 @@ public class Controller {
                             break;
                         }
                     } catch (RuntimeException e) {
-                        new JustAlert(
-                                Alert.AlertType.ERROR,
-                                e.getMessage()
-                        ).showAndWait();
+                        Platform.runLater(() -> new JustAlert(Message.RUNTIME_ERROR).showAndWait());
+                        System.out.println(e.getMessage());
                         return;
                     }
 
                     if (route == null) {
-                        new JustAlert(
-                                Alert.AlertType.WARNING,
-                                "Couldn't find route! Make sure to all cables are connected correctly."
-                        ).showAndWait();
+                        Platform.runLater(() -> new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait());
                     } else {
                         String p1;
                         String p2 = route.get(0);
@@ -313,10 +308,7 @@ public class Controller {
     @SuppressWarnings("unchecked")
     void graphByTopology() {
         if (topologyDataCache.size() < 2) {
-            new JustAlert(
-                    Alert.AlertType.ERROR,
-                    "There aren't enough saved topologies"
-            ).showAndWait();
+            new JustAlert(Message.AT_LEAST_TWO_TOPOLOGIES).showAndWait();
             return;
         }
 
@@ -342,10 +334,7 @@ public class Controller {
     @FXML
     void graphByCableCount() {
         if (routersMap.size() < 2) {
-            new JustAlert(
-                    Alert.AlertType.ERROR,
-                    "There aren't enough routers"
-            ).showAndWait();
+            new JustAlert(Message.AT_LEAST_TWO_ROUTER).showAndWait();
             return;
         }
 
@@ -366,10 +355,7 @@ public class Controller {
         List<String> route = FindRoute.withDijkstra(getMetricsTable(true), source, target);
 
         if (route == null) {
-            new JustAlert(
-                    Alert.AlertType.WARNING,
-                    "Couldn't find route! Make sure to all cables are connected correctly."
-            ).showAndWait();
+            new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait();
             return;
         }
 
@@ -380,11 +366,8 @@ public class Controller {
 
     @FXML
     void saveTopology() {
-        if (routersMap.size() < 3) {
-            new JustAlert(
-                    Alert.AlertType.ERROR,
-                    "There aren't enough routers"
-            ).showAndWait();
+        if (routersMap.size() < 2) {
+            new JustAlert(Message.AT_LEAST_TWO_ROUTER).showAndWait();
             return;
         }
         Optional<Map<String, String>> stringStringMap = new SaveTopologyDialog(routersMap.keySet(), topologyDataCache.size()).showAndWait();
@@ -395,18 +378,12 @@ public class Controller {
             List<String> route = FindRoute.withDijkstra(getMetricsTable(true), source, target);
 
             if (route == null) {
-                new JustAlert(
-                        Alert.AlertType.WARNING,
-                        "Couldn't find route! Make sure to all cables are connected correctly."
-                ).showAndWait();
+                new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait();
                 return;
             }
 
             if (topologyDataCache.containsKey(name)) {
-                new JustAlert(
-                        Alert.AlertType.ERROR,
-                        "There is topology with a name " + name
-                ).showAndWait();
+                new JustAlert(Message.TOPOLOGY_NAME_EXISTS).showAndWait();
                 return;
             }
 
