@@ -25,16 +25,16 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(10));
         gridPane.getColumnConstraints().addAll(
-                new ColumnConstraints(150,150,150),
+                new ColumnConstraints(200,200,200),
                 new ColumnConstraints(100,100,100)
         );
 
         Font font = new Font("JetBrainsMono Nerd Font", 16);
 
-        Label routerReliabilityLabel = new Label("Reliability (0.xxx):");
+        Label routerReliabilityLabel = new Label("Cable's reliability (0.xxxx):");
 
         Spinner<Integer> routerReliability = new Spinner<>(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(900, 999, 990)
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(9900, 9999, 9990)
         );
         routerReliability.setEditable(true);
 
@@ -116,6 +116,8 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
             targetLabel.setFont(font);
             sourceLabel.setFont(font);
             targetLabel.setFont(font);
+            ccFromLabel.setFont(font);
+            ccToLabel.setFont(font);
             sourceBox.getEditor().setFont(font);
             targetBox.getEditor().setFont(font);
             ccFromSpinner.getEditor().setFont(font);

@@ -178,6 +178,8 @@ public class Controller {
         desk.getChildren().clear();
         findRouteBtn.setDisable(true);
         r = 0;
+
+        if (toggles.getSelectedToggle() == null) return;
         toggles.getSelectedToggle().setSelected(false);
     }
 
@@ -378,7 +380,13 @@ public class Controller {
 
     @FXML
     void saveTopology() {
-        if (routersMap.size() < 3) return;
+        if (routersMap.size() < 3) {
+            new JustAlert(
+                    Alert.AlertType.ERROR,
+                    "There aren't enough routers"
+            ).showAndWait();
+            return;
+        }
         Optional<Map<String, String>> stringStringMap = new SaveTopologyDialog(routersMap.keySet(), topologyDataCache.size()).showAndWait();
         stringStringMap.ifPresent(map -> {
             String name = map.get("name");
