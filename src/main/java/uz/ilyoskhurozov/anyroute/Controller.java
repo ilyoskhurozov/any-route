@@ -17,9 +17,11 @@ import uz.ilyoskhurozov.anyroute.component.dialog.ComparingGraphDialog;
 import uz.ilyoskhurozov.anyroute.component.dialog.ConPropsDialog;
 import uz.ilyoskhurozov.anyroute.component.dialog.JustAlert;
 import uz.ilyoskhurozov.anyroute.component.dialog.SaveTopologyDialog;
-import uz.ilyoskhurozov.anyroute.util.FindRoute;
 import uz.ilyoskhurozov.anyroute.util.ReliabilityGraphData;
 import uz.ilyoskhurozov.anyroute.util.TopologyData;
+import uz.ilyoskhurozov.anyroute.util.algo.Dijkstra;
+import uz.ilyoskhurozov.anyroute.util.algo.RouteAlgorithm;
+import uz.ilyoskhurozov.anyroute.util.algo.RouteUtil;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -215,31 +217,15 @@ public class Controller {
             Thread thread = new Thread(() -> {
                 findRouteBtn.setDisable(true);
 
-                String algo = algorithms.getValue();
-                List<String> route = null;
+                String algoName = algorithms.getValue();
+                List<String> route;
                 AtomicLong begin = new AtomicLong(), end = new AtomicLong();
 
                 try {
-                    switch (algo) {
-                        case "Dijskstra": {
-                            begin.set(System.nanoTime());
-                            route = FindRoute.withDijkstra(getMetricsTable(true), r1, r2);
-                            end.set(System.nanoTime());
-                        }
-                        break;
-                        case "Floyd": {
-                            begin.set(System.nanoTime());
-                            route = FindRoute.withFloyd(getMetricsTable(true), r1, r2);
-                            end.set(System.nanoTime());
-                        }
-                        break;
-                        case "Bellman-Ford": {
-                            begin.set(System.nanoTime());
-                            route = FindRoute.withBellmanFord(getMetricsTable(false), r1, r2);
-                            end.set(System.nanoTime());
-                        }
-                        break;
-                    }
+                    RouteAlgorithm algo = RouteUtil.getRouteAlgorithm(algoName);
+                    begin.set(System.nanoTime());
+                    route = algo.findRoute(getMetricsTable(!algoName.equals("Bellman-Ford")), r1, r2);
+                    end.set(System.nanoTime());
                 } catch (RuntimeException e) {
                     Platform.runLater(() -> new JustAlert(Message.RUNTIME_ERROR).showAndWait());
                     System.out.println(e.getMessage());
@@ -363,7 +349,7 @@ public class Controller {
         Integer cableCountFrom = ((Integer) data.get("cableCountFrom"));
         Integer cableCountTo = ((Integer) data.get("cableCountTo"));
 
-        List<String> route = FindRoute.withDijkstra(getMetricsTable(true), source, target);
+        List<String> route = new Dijkstra().findRoute(getMetricsTable(true), source, target);
 
         if (route == null) {
             new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait();
@@ -386,7 +372,7 @@ public class Controller {
             String name = map.get("name");
             String source = map.get("source");
             String target = map.get("target");
-            List<String> route = FindRoute.withDijkstra(getMetricsTable(true), source, target);
+            List<String> route = new Dijkstra().findRoute(getMetricsTable(true), source, target);
 
             if (route == null) {
                 new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait();
