@@ -24,43 +24,37 @@ public class Floyd extends RouteAlgorithm {
 
         //find routes
         routers.forEach(
-                i -> {
-                    System.out.println(i);
-                    routers.forEach(
-                            col -> {
-                                System.out.println(i+":"+col);
-                                Integer dx = table.get(i).get(col);
-                                if (dx == null) {
-                                    System.out.println("/");
-                                    return;
-                                }
+                i -> routers.forEach(
+                        col -> {
+                            Integer dx = table.get(i).get(col);
+                            if (dx == null) {
+                                return;
+                            }
 
-                                routers.stream().takeWhile(row -> !row.equals(col)).forEach(
-                                        row -> {
-                                            System.out.println(i+":"+col+":"+row);
-                                            Integer dy = table.get(row).get(i);
+                            routers.stream().takeWhile(row -> !row.equals(col)).forEach(
+                                    row -> {
+                                        Integer dy = table.get(row).get(i);
 
-                                            if (dy != null) {
-                                                Integer d = dy + dx;
-                                                Integer cell = table.get(row).get(col);
-                                                if (cell == null || cell > d) {
-                                                    table.get(row).put(col, d);
-                                                    table.get(col).put(row, d);
+                                        if (dy != null) {
+                                            Integer d = dy + dx;
+                                            Integer cell = table.get(row).get(col);
+                                            if (cell == null || cell > d) {
+                                                table.get(row).put(col, d);
+                                                table.get(col).put(row, d);
 
-                                                    String pCol = prevTable.get(i).get(col);
-                                                    if (pCol.equals(col)) pCol = i;
+                                                String pCol = prevTable.get(i).get(col);
+                                                if (pCol.equals(col)) pCol = i;
 
-                                                    String pRow = prevTable.get(row).get(i);
+                                                String pRow = prevTable.get(row).get(i);
 
-                                                    prevTable.get(row).put(col, pCol);
-                                                    prevTable.get(col).put(row, pRow);
-                                                }
+                                                prevTable.get(row).put(col, pCol);
+                                                prevTable.get(col).put(row, pRow);
                                             }
                                         }
-                                );
-                            }
-                    );
-                }
+                                    }
+                            );
+                        }
+                )
         );
 
         //assemble route
