@@ -71,7 +71,7 @@ public class Controller {
 
     @FXML
     private void initialize() {
-        algorithms.getItems().addAll("Dijskstra", "Floyd", "Bellman-Ford");
+        algorithms.getItems().addAll("Dijkstra", "Floyd", "Bellman-Ford");
         algorithms.getSelectionModel().selectFirst();
 
         connectionsTable = new TreeMap<>();
