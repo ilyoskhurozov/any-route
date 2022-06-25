@@ -399,7 +399,13 @@ public class Controller {
 
     @FXML
     void clearCache() {
-        topologyDataCache.clear();
+        new JustAlert(Message.DELETE_TOPOLOGY_CACHE_CONFIRMATION)
+                .showAndWait()
+                .ifPresent(buttonType -> {
+                    if (buttonType == ButtonType.OK) {
+                        topologyDataCache.clear();
+                    }
+                });
     }
 
     @FXML
