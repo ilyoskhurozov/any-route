@@ -1,9 +1,12 @@
 package uz.ilyoskhurozov.anyroute;
 
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -12,7 +15,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import uz.ilyoskhurozov.anyroute.component.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import uz.ilyoskhurozov.anyroute.component.ComparingGraphView;
+import uz.ilyoskhurozov.anyroute.component.Connection;
+import uz.ilyoskhurozov.anyroute.component.Router;
+import uz.ilyoskhurozov.anyroute.component.SourceTargetPane;
 import uz.ilyoskhurozov.anyroute.component.dialog.ComparingGraphDialog;
 import uz.ilyoskhurozov.anyroute.component.dialog.ConPropsDialog;
 import uz.ilyoskhurozov.anyroute.component.dialog.JustAlert;
@@ -23,6 +31,7 @@ import uz.ilyoskhurozov.anyroute.util.algo.Dijkstra;
 import uz.ilyoskhurozov.anyroute.util.algo.RouteAlgorithm;
 import uz.ilyoskhurozov.anyroute.util.algo.RouteUtil;
 
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -411,6 +420,28 @@ public class Controller {
     @FXML
     void close() {
         Platform.exit();
+    }
+
+    @FXML
+    void showSchema(ActionEvent event) {
+        String algo = ((MenuItem) event.getTarget()).getText();
+        InputStream schemaFile = App.class.getResourceAsStream("/images/block-schema/"+algo+".png");
+
+        if (schemaFile == null) {
+            new JustAlert(Message.RUNTIME_ERROR).showAndWait();
+            return;
+        }
+        Image image = new Image(schemaFile);
+
+        Stage stage = new Stage();
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(algo+" block-schema");
+
+        ScrollPane root = new ScrollPane(new ImageView(image));
+        stage.setScene(new Scene(root, image.getWidth()+16, 600));
+
+        stage.showAndWait();
     }
 
     //helper methods

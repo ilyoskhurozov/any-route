@@ -172,6 +172,13 @@
                </accelerator>
             </MenuItem>
              </Menu>
+         <Menu mnemonicParsing="false" text="Algorithm block-schema">
+           <items>
+             <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Dijkstra" />
+               <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Floyd" />
+               <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Bellman-Ford" />
+           </items>
+         </Menu>
        </MenuBar>
     </top>
 </BorderPane>
