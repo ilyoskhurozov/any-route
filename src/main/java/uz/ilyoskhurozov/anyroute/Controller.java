@@ -418,11 +418,6 @@ public class Controller {
     }
 
     @FXML
-    void close() {
-        Platform.exit();
-    }
-
-    @FXML
     void showSchema(ActionEvent event) {
         String algo = ((MenuItem) event.getTarget()).getText();
         InputStream schemaFile = App.class.getResourceAsStream("/images/block-schema/"+algo+".png");

@@ -139,13 +139,6 @@
     </right>
     <top>
         <MenuBar BorderPane.alignment="CENTER">
-            <Menu mnemonicParsing="false" text="Menu">
-                <MenuItem mnemonicParsing="false" onAction="#close" text="Exit">
-                    <accelerator>
-                        <KeyCodeCombination alt="DOWN" code="X" control="UP" meta="UP" shift="UP" shortcut="UP" />
-                    </accelerator>
-                </MenuItem>
-            </Menu>
              <Menu mnemonicParsing="false" text="Reliability graph">
             <Menu mnemonicParsing="false" text="Cache">
                <items>
