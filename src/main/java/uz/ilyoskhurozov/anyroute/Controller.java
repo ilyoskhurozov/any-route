@@ -17,20 +17,24 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import uz.ilyoskhurozov.anyroute.component.ComparingGraphView;
 import uz.ilyoskhurozov.anyroute.component.Connection;
 import uz.ilyoskhurozov.anyroute.component.Router;
 import uz.ilyoskhurozov.anyroute.component.SourceTargetPane;
+import uz.ilyoskhurozov.anyroute.component.dialog.ComparingGraphDialog;
 import uz.ilyoskhurozov.anyroute.component.dialog.ConPropsDialog;
 import uz.ilyoskhurozov.anyroute.component.dialog.JustAlert;
+import uz.ilyoskhurozov.anyroute.component.dialog.SaveTopologyDialog;
+import uz.ilyoskhurozov.anyroute.util.ReliabilityGraphData;
+import uz.ilyoskhurozov.anyroute.util.TopologyData;
+import uz.ilyoskhurozov.anyroute.util.algo.Dijkstra;
 import uz.ilyoskhurozov.anyroute.util.algo.RouteAlgorithm;
 import uz.ilyoskhurozov.anyroute.util.algo.RouteUtil;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 
 public class Controller {
@@ -39,6 +43,7 @@ public class Controller {
     private TreeMap<String, Router> routersMap;
     private Connection currentConnection;
     private final ConPropsDialog conPropsDialog = new ConPropsDialog();
+    private final Map<String, TopologyData> topologyDataCache = new LinkedHashMap<>();
 
     @FXML
     private AnchorPane desk;
@@ -306,6 +311,113 @@ public class Controller {
     //Menus
 
     @FXML
+    @SuppressWarnings("unchecked")
+    void graphByTopology() {
+        if (topologyDataCache.size() < 2) {
+            new JustAlert(Message.AT_LEAST_TWO_TOPOLOGIES).showAndWait();
+            return;
+        }
+
+        Optional<Map<String, Object>> dataOpt = new ComparingGraphDialog(
+                topologyDataCache.keySet(), true
+        ).showAndWait();
+
+        if (dataOpt.isEmpty()) return;
+
+        Map<String, Object> data = dataOpt.get();
+
+        double routerRel = ((double) data.get("routerRel"));
+        List<String> topologyNames = (List<String>) data.get("topologies");
+        List<TopologyData> topologies = topologyDataCache.values().stream()
+                .filter(topologyData -> topologyNames.contains(topologyData.name))
+                .collect(Collectors.toList());
+
+        showComparingGraphView(
+                ReliabilityGraphData.comparingTopologies(routerRel, topologies)
+        );
+    }
+
+    @FXML
+    void graphByCableCount() {
+        if (routersMap.size() < 2) {
+            new JustAlert(Message.AT_LEAST_TWO_ROUTERS).showAndWait();
+            return;
+        }
+
+        Optional<Map<String, Object>> dataOpt = new ComparingGraphDialog(
+                routersMap.keySet(), false
+        ).showAndWait();
+
+        if (dataOpt.isEmpty()) return;
+
+        Map<String, Object> data = dataOpt.get();
+
+        double routerRel = ((double) data.get("routerRel"));
+        String source = ((String) data.get("source"));
+        String target = ((String) data.get("target"));
+        Integer cableCountFrom = ((Integer) data.get("cableCountFrom"));
+        Integer cableCountTo = ((Integer) data.get("cableCountTo"));
+
+        List<String> route = new Dijkstra().findRoute(getMetricsTable(true), source, target);
+
+        if (route == null) {
+            new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait();
+            return;
+        }
+
+        showComparingGraphView(ReliabilityGraphData.comparingCableCount(
+                routerRel, cableCountFrom, cableCountTo, route.size()
+        ));
+    }
+
+    @FXML
+    void saveTopology() {
+        if (routersMap.size() < 2) {
+            new JustAlert(Message.AT_LEAST_TWO_ROUTERS).showAndWait();
+            return;
+        }
+        Optional<Map<String, String>> stringStringMap = new SaveTopologyDialog(routersMap.keySet(), topologyDataCache.size()).showAndWait();
+        stringStringMap.ifPresent(map -> {
+            String name = map.get("name");
+            String source = map.get("source");
+            String target = map.get("target");
+            List<String> route = new Dijkstra().findRoute(getMetricsTable(true), source, target);
+
+            if (route == null) {
+                new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait();
+                return;
+            }
+
+            if (topologyDataCache.containsKey(name)) {
+                new JustAlert(Message.TOPOLOGY_NAME_EXISTS).showAndWait();
+                return;
+            }
+
+            topologyDataCache.put(
+                    name,
+                    new TopologyData(
+                            name,
+                            source,
+                            target,
+                            getIsConnectedTable()
+                    )
+            );
+            clearDesk();
+        });
+    }
+
+    @FXML
+    void clearCache() {
+        new JustAlert(Message.DELETE_TOPOLOGY_CACHE_CONFIRMATION)
+                .showAndWait()
+                .ifPresent(buttonType -> {
+                    if (buttonType == ButtonType.OK) {
+                        topologyDataCache.clear();
+                    }
+                });
+    }
+
+    @FXML
     void showSchema(ActionEvent event) {
         String algo = ((MenuItem) event.getTarget()).getText();
         InputStream schemaFile = App.class.getResourceAsStream("/images/block-schema/"+algo+".png");
@@ -384,5 +496,31 @@ public class Controller {
         }));
 
         return table;
+    }
+
+    private Map<String, Map<String, Boolean>> getIsConnectedTable() {
+        Map<String, Map<String, Boolean>> map = new TreeMap<>();
+        Set<String> routerNames = routersMap.keySet();
+
+        connectionsTable.forEach((r, cableMap) -> map.put(r, new TreeMap<>()));
+        connectionsTable.forEach((r1, row) -> {
+            row.forEach((r2, con) -> {
+                map.get(r1).put(r2, true);
+                map.get(r2).put(r1, true);
+            });
+            routerNames.forEach(r2 -> map.get(r1).putIfAbsent(r2, false));
+        });
+
+        return map;
+    }
+
+    private void showComparingGraphView(Map<String, double[]> chartData) {
+        new ComparingGraphView(
+                chartData,
+                new double[] {
+                        0.99, 0.99099, 0.99198, 0.99297, 0.99396, 0.99495,
+                        0.99594, 0.99693, 0.99792, 0.99891, 0.9999,
+                }
+        ).showAndWait();
     }
 }
