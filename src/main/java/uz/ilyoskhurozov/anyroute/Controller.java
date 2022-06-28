@@ -7,10 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.VBox;
@@ -89,6 +86,9 @@ public class Controller {
 
     @FXML
     void mouseClickOnDesk(MouseEvent e) {
+        if (e.getButton() != MouseButton.PRIMARY) {
+            return;
+        }
         if (routerBtn.isSelected() && e.getTarget().equals(desk)) {
             Router router = new Router(++r, e.getX(), e.getY());
 
