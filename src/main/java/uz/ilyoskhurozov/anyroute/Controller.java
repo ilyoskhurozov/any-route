@@ -142,8 +142,8 @@ public class Controller {
 
                                     conPropsDialog.showAndWait().ifPresent(
                                             conProps -> {
-                                                connection.setProps(conProps.metrics);
-                                                connection.setCableCount(conProps.count);
+                                                connection.setProps(conProps.metrics());
+                                                connection.setCableCount(conProps.count());
                                             }
                                     );
                                 }
@@ -329,7 +329,7 @@ public class Controller {
         double routerRel = ((double) data.get("routerRel"));
         List<String> topologyNames = (List<String>) data.get("topologies");
         List<TopologyData> topologies = topologyDataCache.values().stream()
-                .filter(topologyData -> topologyNames.contains(topologyData.name))
+                .filter(topologyData -> topologyNames.contains(topologyData.name()))
                 .collect(Collectors.toList());
 
         showComparingGraphView(

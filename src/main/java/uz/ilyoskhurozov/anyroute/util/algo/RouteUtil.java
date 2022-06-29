@@ -3,12 +3,12 @@ package uz.ilyoskhurozov.anyroute.util.algo;
 public class RouteUtil {
 
     public static RouteAlgorithm getRouteAlgorithm(String algoName){
-        switch (algoName){
-            case "Dijkstra":        return new Dijkstra();
-            case "Floyd":           return new Floyd();
-            case "Bellman-Ford":    return new BellmanFord();
-            default:                throw new RuntimeException("Not implemented Algorithm");
-        }
+        return switch (algoName) {
+            case "Dijkstra" -> new Dijkstra();
+            case "Floyd" -> new Floyd();
+            case "Bellman-Ford" -> new BellmanFord();
+            default -> throw new RuntimeException("Not implemented Algorithm");
+        };
     }
 
 }

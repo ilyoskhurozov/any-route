@@ -13,7 +13,6 @@ import uz.ilyoskhurozov.anyroute.component.SourceTargetPane;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
 
@@ -51,7 +50,7 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
         //DIVERSE
         if (isByTopologies) {
             FlowPane topologiesPane = new FlowPane();
-            List<CheckBox> checks = names.stream().map(CheckBox::new).collect(Collectors.toList());
+            List<CheckBox> checks = names.stream().map(CheckBox::new).toList();
             topologiesPane.getChildren().addAll(checks);
 
             Label topologiesLabel = new Label("Topologies:");
@@ -83,7 +82,7 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
                             "topologies", checks.stream()
                                     .filter(CheckBox::isSelected)
                                     .map(CheckBox::getText)
-                                    .collect(Collectors.toList())
+                                    .toList()
                     );
                 }
                 return null;

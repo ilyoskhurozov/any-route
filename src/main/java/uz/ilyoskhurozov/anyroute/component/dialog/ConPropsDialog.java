@@ -9,15 +9,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 
 public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
-    public static class ConProps {
-        public final int metrics;
-        public final int count;
-
-        public ConProps(int metrics, int count){
-            this.metrics = metrics;
-            this.count = count;
-        }
-    }
+    public record ConProps(int metrics, int count) {}
 
     private final Spinner<Integer> metricsSpinner;
     private final Spinner<Integer> countSpinner;

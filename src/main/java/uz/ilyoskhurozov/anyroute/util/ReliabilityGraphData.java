@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.lang.Math.pow;
 
@@ -51,13 +50,12 @@ public class ReliabilityGraphData {
         topologyData.forEach(data -> {
             List<String> routes = new ArrayList<>();
             findAllRoutes(
-                    data.isConnectedTable, data.source+"-",
-                    data.source, data.target, routes
+                    data.isConnectedTable(), data.name()+"-",
+                    data.source(), data.target(), routes
             );
 
             List<Integer> routerCountList = routes.parallelStream()
-                    .map(route -> route.split("-").length)
-                    .collect(Collectors.toList());
+                    .map(route -> route.split("-").length).toList();
 
             double[] row = new double[routerReliabilities.length];
 
@@ -78,7 +76,7 @@ public class ReliabilityGraphData {
                 );
             }
 
-            chartData.put(data.name, row);
+            chartData.put(data.name(), row);
         });
 
         return chartData;
