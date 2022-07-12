@@ -463,6 +463,10 @@ public class Controller {
                 new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.CONTROL_ANY),
                 this::cancel
         );
+        scene.getAccelerators().put(
+                new KeyCodeCombination(KeyCode.F1),
+                () -> new JustAlert(Message.SOURCE_CODE).showAndWait()
+        );
     }
 
     private void cancel() {

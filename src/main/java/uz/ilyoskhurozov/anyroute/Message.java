@@ -8,7 +8,8 @@ public enum Message {
     AT_LEAST_TWO_TOPOLOGIES(Alert.AlertType.WARNING, "Make sure there's at least 2 topologies."),
     AT_LEAST_TWO_ROUTERS(Alert.AlertType.WARNING, "Make sure there's at least 2 routers."),
     TOPOLOGY_NAME_EXISTS(Alert.AlertType.WARNING, "There is topology with this name."),
-    DELETE_TOPOLOGY_CACHE_CONFIRMATION(Alert.AlertType.CONFIRMATION, "Do you want to delete topology cache");
+    DELETE_TOPOLOGY_CACHE_CONFIRMATION(Alert.AlertType.CONFIRMATION, "Do you want to delete topology cache"),
+    SOURCE_CODE(Alert.AlertType.INFORMATION, "Source code: https://github.com/ilyoskhurozov/any-route");
 
     public final Alert.AlertType type;
     public final String text;
