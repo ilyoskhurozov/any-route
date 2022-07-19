@@ -237,13 +237,13 @@ public class Controller {
                     route = algo.findRoute(getMetricsTable(!algoName.equals("Bellman-Ford")), r1, r2);
                     end.set(System.nanoTime());
                 } catch (RuntimeException e) {
-                    Platform.runLater(() -> new JustAlert(Message.RUNTIME_ERROR).showAndWait());
+                    Platform.runLater(() -> new JustAlert(JustAlert.Message.RUNTIME_ERROR).showAndWait());
                     System.out.println(e.getMessage());
                     return;
                 }
 
                 if (route == null) {
-                    Platform.runLater(() -> new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait());
+                    Platform.runLater(() -> new JustAlert(JustAlert.Message.ROUTE_NOT_FOUND).showAndWait());
                 } else {
                     String p1;
                     String p2 = route.get(0);
@@ -315,7 +315,7 @@ public class Controller {
     @SuppressWarnings("unchecked")
     void graphByTopology() {
         if (topologyDataCache.size() < 2) {
-            new JustAlert(Message.AT_LEAST_TWO_TOPOLOGIES).showAndWait();
+            new JustAlert(JustAlert.Message.AT_LEAST_TWO_TOPOLOGIES).showAndWait();
             return;
         }
 
@@ -341,7 +341,7 @@ public class Controller {
     @FXML
     void graphByCableCount() {
         if (routersMap.size() < 2) {
-            new JustAlert(Message.AT_LEAST_TWO_ROUTERS).showAndWait();
+            new JustAlert(JustAlert.Message.AT_LEAST_TWO_ROUTERS).showAndWait();
             return;
         }
 
@@ -362,7 +362,7 @@ public class Controller {
         List<String> route = new Dijkstra().findRoute(getMetricsTable(true), source, target);
 
         if (route == null) {
-            new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait();
+            new JustAlert(JustAlert.Message.ROUTE_NOT_FOUND).showAndWait();
             return;
         }
 
@@ -374,7 +374,7 @@ public class Controller {
     @FXML
     void saveTopology() {
         if (routersMap.size() < 2) {
-            new JustAlert(Message.AT_LEAST_TWO_ROUTERS).showAndWait();
+            new JustAlert(JustAlert.Message.AT_LEAST_TWO_ROUTERS).showAndWait();
             return;
         }
         Optional<Map<String, String>> stringStringMap = new SaveTopologyDialog(routersMap.keySet(), topologyDataCache.size()).showAndWait();
@@ -385,12 +385,12 @@ public class Controller {
             List<String> route = new Dijkstra().findRoute(getMetricsTable(true), source, target);
 
             if (route == null) {
-                new JustAlert(Message.ROUTE_NOT_FOUND).showAndWait();
+                new JustAlert(JustAlert.Message.ROUTE_NOT_FOUND).showAndWait();
                 return;
             }
 
             if (topologyDataCache.containsKey(name)) {
-                new JustAlert(Message.TOPOLOGY_NAME_EXISTS).showAndWait();
+                new JustAlert(JustAlert.Message.TOPOLOGY_NAME_EXISTS).showAndWait();
                 return;
             }
 
@@ -409,7 +409,7 @@ public class Controller {
 
     @FXML
     void clearCache() {
-        new JustAlert(Message.DELETE_TOPOLOGY_CACHE_CONFIRMATION)
+        new JustAlert(JustAlert.Message.DELETE_TOPOLOGY_CACHE_CONFIRMATION)
                 .showAndWait()
                 .ifPresent(buttonType -> {
                     if (buttonType == ButtonType.OK) {
@@ -424,7 +424,7 @@ public class Controller {
         InputStream schemaFile = App.class.getResourceAsStream("/images/block-schema/"+algo+".png");
 
         if (schemaFile == null) {
-            new JustAlert(Message.RUNTIME_ERROR).showAndWait();
+            new JustAlert(JustAlert.Message.RUNTIME_ERROR).showAndWait();
             return;
         }
         Image image = new Image(schemaFile);
@@ -467,7 +467,7 @@ public class Controller {
         );
         scene.getAccelerators().put(
                 new KeyCodeCombination(KeyCode.F1),
-                () -> new JustAlert(Message.SOURCE_CODE).showAndWait()
+                () -> new JustAlert(JustAlert.Message.SOURCE_CODE).showAndWait()
         );
     }
 
