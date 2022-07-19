@@ -16,8 +16,8 @@ public class App extends Application {
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Any route");
         stage.setScene(scene);
-        stage.setResizable(false);
         stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("/images/gps.png"))));
+        stage.setMaximized(true);
         Controller controller = fxmlLoader.getController();
         controller.bindKeys();
         stage.show();

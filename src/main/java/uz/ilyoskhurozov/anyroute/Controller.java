@@ -13,6 +13,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import uz.ilyoskhurozov.anyroute.component.ComparingGraphView;
 import uz.ilyoskhurozov.anyroute.component.Connection;
@@ -434,7 +435,8 @@ public class Controller {
         stage.setTitle(algo+" block-schema");
 
         ScrollPane root = new ScrollPane(new ImageView(image));
-        stage.setScene(new Scene(root, image.getWidth()+16, 600));
+        double height = Screen.getPrimary().getBounds().getHeight() * 0.6;
+        stage.setScene(new Scene(root, image.getWidth()+16, height));
 
         stage.showAndWait();
     }
