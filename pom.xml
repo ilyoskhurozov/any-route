@@ -58,9 +58,8 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>uz.ilyoskhurozov.anyroute/uz.ilyoskhurozov.anyroute.App</mainClass>
-                            <launcher>app</launcher>
-                            <jlinkZipName>app</jlinkZipName>
-                            <jlinkImageName>app</jlinkImageName>
+                            <launcher>Any route</launcher>
+                            <jlinkImageName>Any route</jlinkImageName>
                             <noManPages>true</noManPages>
                             <stripDebug>true</stripDebug>
                             <noHeaderFiles>true</noHeaderFiles>
