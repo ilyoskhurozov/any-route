@@ -31,7 +31,7 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
 
         Font font = new Font("JetBrainsMono Nerd Font", 16);
 
-        Label routerReliabilityLabel = new Label("Cable's reliability (0.xxxx):");
+        Label routerReliabilityLabel = new Label("Router's reliability (0.xxxx):");
 
         Spinner<Integer> routerReliability = new Spinner<>(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(9900, 9999, 9990)
