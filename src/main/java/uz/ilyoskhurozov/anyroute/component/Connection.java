@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 public class Connection extends Group {
     private int metrics;
+    private int availability;
     private final Label label;
     private final ArrayList<Line> cables;
     private String source;
@@ -23,17 +24,19 @@ public class Connection extends Group {
     private boolean isSendingData = false;
     private Color defColor;
     private static final int DEFAULT_METRIC = 1;
+    private static final int DEFAULT_AVAILABILITY = 1;
     private DoubleBinding startX;
     private DoubleBinding startY;
     private DoubleBinding endX;
     private DoubleBinding endY;
 
     public Connection() {
-        this(DEFAULT_METRIC);
+        this(DEFAULT_METRIC, DEFAULT_AVAILABILITY);
     }
 
-    public Connection(int metrics) {
+    public Connection(int metrics, int availability) {
         this.metrics = metrics;
+        this.availability = availability;
         label = new Label(metrics + "");
         label.setPadding(new Insets(0, 5, 0, 5));
         label.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
@@ -87,7 +90,7 @@ public class Connection extends Group {
     public void setCableCount(int n) {
         while (cables.size() > n) {
             getChildren().remove(
-                cables.remove(n)
+                    cables.remove(n)
             );
         }
         while (cables.size() < n) {
@@ -274,14 +277,20 @@ public class Connection extends Group {
         return metrics;
     }
 
+    public int getAvailability() {
+        return availability;
+    }
 
-    public void setProps(int metrics) {
+
+    public void setProps(int metrics, int availability) {
         this.metrics = metrics;
+        this.availability = availability;
         label.setText(Integer.toString(metrics));
     }
 
     @Override
     public String toString() {
-        return "Cable{" + metrics + "}";
+        return "Cable{ metrics: " + metrics + ",\n"
+                + "availability: " + availability + "}";
     }
 }

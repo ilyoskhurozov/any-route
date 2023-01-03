@@ -139,11 +139,11 @@ public class Controller {
                                     String[] names = new String[]{connection.getSource(), connection.getTarget()};
                                     Arrays.sort(names);
                                     conPropsDialog.setTitle(names[0] + " - " + names[1]);
-                                    conPropsDialog.setProps(connection.getMetrics(), connection.getCableCount());
+                                    conPropsDialog.setProps(connection.getMetrics(), connection.getCableCount(), connection.getAvailability());
 
                                     conPropsDialog.showAndWait().ifPresent(
                                             conProps -> {
-                                                connection.setProps(conProps.metrics());
+                                                connection.setProps(conProps.metrics(), conProps.availability());
                                                 connection.setCableCount(conProps.count());
                                             }
                                     );
@@ -161,7 +161,7 @@ public class Controller {
 
                     routersMap.keySet().forEach(r -> {
                         Connection connection = connectionsTable.get(r).remove(routerName);
-                        if (connection == null){
+                        if (connection == null) {
                             connection = connectionsTable.get(routerName).remove(r);
                         }
 
@@ -206,8 +206,8 @@ public class Controller {
 
         SourceTargetPane stPane = new SourceTargetPane(routersMap.keySet(), font);
         stPane.getColumnConstraints().addAll(
-                new ColumnConstraints(100,100,100),
-                new ColumnConstraints(100,100,100)
+                new ColumnConstraints(100, 100, 100),
+                new ColumnConstraints(100, 100, 100)
         );
 
         Dialog<Map<String, String>> stDialog = new Dialog<>();
@@ -285,7 +285,7 @@ public class Controller {
                             }
                         }
                         time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
-                        distance.setText(dis.get() + "");
+                        distance.setText(String.valueOf(dis.get()));
                     });
                     resultsPane.setVisible(true);
                 }
@@ -421,7 +421,7 @@ public class Controller {
     @FXML
     void showSchema(ActionEvent event) {
         String algo = ((MenuItem) event.getTarget()).getText();
-        InputStream schemaFile = App.class.getResourceAsStream("/images/block-schema/"+algo+".png");
+        InputStream schemaFile = App.class.getResourceAsStream("/images/block-schema/" + algo + ".png");
 
         if (schemaFile == null) {
             new JustAlert(JustAlert.Message.RUNTIME_ERROR).showAndWait();
@@ -432,11 +432,11 @@ public class Controller {
         Stage stage = new Stage();
 
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(algo+" block-schema");
+        stage.setTitle(algo + " block-schema");
 
         ScrollPane root = new ScrollPane(new ImageView(image));
         double height = Screen.getPrimary().getBounds().getHeight() * 0.6;
-        stage.setScene(new Scene(root, image.getWidth()+16, height));
+        stage.setScene(new Scene(root, image.getWidth() + 16, height));
 
         stage.showAndWait();
     }
@@ -495,7 +495,8 @@ public class Controller {
                 table.get(r1).put(r2, con.getMetrics());
 
                 if (isUndirected) {
-                    if (con.getMetrics() < 0) throw new IllegalArgumentException("Negative metrics on undirected connection");
+                    if (con.getMetrics() < 0)
+                        throw new IllegalArgumentException("Negative metrics on undirected connection");
                     table.get(r2).put(r1, con.getMetrics());
                 }
             }
@@ -523,7 +524,7 @@ public class Controller {
     private void showComparingGraphView(Map<String, double[]> chartData) {
         new ComparingGraphView(
                 chartData,
-                new double[] {
+                new double[]{
                         0.99, 0.99099, 0.99198, 0.99297, 0.99396, 0.99495,
                         0.99594, 0.99693, 0.99792, 0.99891, 0.9999,
                 }

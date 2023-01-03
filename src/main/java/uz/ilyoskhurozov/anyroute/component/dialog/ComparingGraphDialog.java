@@ -25,8 +25,8 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(10));
         gridPane.getColumnConstraints().addAll(
-                new ColumnConstraints(200,200,200),
-                new ColumnConstraints(100,100,100)
+                new ColumnConstraints(200, 200, 200),
+                new ColumnConstraints(100, 100, 100)
         );
 
         Font font = new Font("JetBrainsMono Nerd Font", 16);
@@ -69,6 +69,7 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
                                     .toArray(BooleanProperty[]::new)
                     );
                 }
+
                 @Override
                 protected boolean computeValue() {
                     return checks.parallelStream().filter(CheckBox::isSelected).count() < 2;
@@ -120,6 +121,7 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
                 {
                     super.bind(ccFromSpinner.valueProperty(), ccFromSpinner.valueProperty());
                 }
+
                 @Override
                 protected boolean computeValue() {
                     return ccToSpinner.getValue() - ccFromSpinner.getValue() < 2;
