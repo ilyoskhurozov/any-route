@@ -77,8 +77,11 @@ public class Controller {
     private Label distance;
 
     @FXML
+    private Label availability;
+
+    @FXML
     private void initialize() {
-        algorithms.getItems().addAll("Dijkstra", "Floyd", "Bellman-Ford");
+        algorithms.getItems().addAll("Dijkstra", "Floyd", "Bellman-Ford", "Fuzzy logic");
         algorithms.getSelectionModel().selectFirst();
 
         connectionsTable = new TreeMap<>();
@@ -234,7 +237,7 @@ public class Controller {
                 try {
                     RouteAlgorithm algo = RouteUtil.getRouteAlgorithm(algoName);
                     begin.set(System.nanoTime());
-                    route = algo.findRoute(getMetricsTable(!algoName.equals("Bellman-Ford")), r1, r2);
+                    route = algo.findRoute(getMetricsTable(!algoName.equals("Bellman-Ford")), r1, r2, null);
                     end.set(System.nanoTime());
                 } catch (RuntimeException e) {
                     Platform.runLater(() -> new JustAlert(JustAlert.Message.RUNTIME_ERROR).showAndWait());
@@ -286,6 +289,7 @@ public class Controller {
                         }
                         time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
                         distance.setText(String.valueOf(dis.get()));
+                        availability.setText("hey");
                     });
                     resultsPane.setVisible(true);
                 }
@@ -359,7 +363,7 @@ public class Controller {
         Integer cableCountFrom = ((Integer) data.get("cableCountFrom"));
         Integer cableCountTo = ((Integer) data.get("cableCountTo"));
 
-        List<String> route = new Dijkstra().findRoute(getMetricsTable(true), source, target);
+        List<String> route = new Dijkstra().findRoute(getMetricsTable(true), source, target, null);
 
         if (route == null) {
             new JustAlert(JustAlert.Message.ROUTE_NOT_FOUND).showAndWait();
@@ -382,7 +386,7 @@ public class Controller {
             String name = map.get("name");
             String source = map.get("source");
             String target = map.get("target");
-            List<String> route = new Dijkstra().findRoute(getMetricsTable(true), source, target);
+            List<String> route = new Dijkstra().findRoute(getMetricsTable(true), source, target, null);
 
             if (route == null) {
                 new JustAlert(JustAlert.Message.ROUTE_NOT_FOUND).showAndWait();

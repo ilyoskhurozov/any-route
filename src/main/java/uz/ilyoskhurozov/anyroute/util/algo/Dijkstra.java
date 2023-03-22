@@ -7,7 +7,7 @@ import java.util.*;
 public class Dijkstra extends RouteAlgorithm {
 
     @Override
-    public List<String> findRoute(TreeMap<String, TreeMap<String, Integer>> table, String source, String target) {
+    public List<String> findRoute(TreeMap<String, TreeMap<String, Integer>> table, String source, String target, Double cableAvailability) {
         PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparing(Node::getDistance));
         HashMap<String, Node> nodeMap = new HashMap<>();
 

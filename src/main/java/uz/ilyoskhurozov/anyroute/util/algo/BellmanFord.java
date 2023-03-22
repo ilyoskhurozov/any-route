@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BellmanFord extends RouteAlgorithm {
     @Override
-    public List<String> findRoute(TreeMap<String, TreeMap<String, Integer>> table, String source, String target) {
+    public List<String> findRoute(TreeMap<String, TreeMap<String, Integer>> table, String source, String target, Double cableAvailability) {
         HashMap<String, Node> nodes = new HashMap<>();
 
         final Node[] node = {new Node(source, null, 0), null};

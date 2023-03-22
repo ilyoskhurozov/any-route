@@ -133,6 +133,16 @@
                            <Font name="JetBrains Mono Medium Nerd Font Complete Mono" size="14.0" />
                        </font>
                    </Label>
+                   <Label text="Availability:">
+                       <font>
+                           <Font name="JetBrains Mono Medium Nerd Font Complete Mono" size="14.0" />
+                       </font>
+                   </Label>
+                   <Label fx:id="availability">
+                       <font>
+                           <Font name="JetBrains Mono Medium Nerd Font Complete Mono" size="14.0" />
+                       </font>
+                   </Label>
                </VBox>
            </VBox>
        </ToolBar>
