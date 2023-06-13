@@ -19,10 +19,8 @@ import uz.ilyoskhurozov.anyroute.component.ComparingGraphView;
 import uz.ilyoskhurozov.anyroute.component.Connection;
 import uz.ilyoskhurozov.anyroute.component.Router;
 import uz.ilyoskhurozov.anyroute.component.SourceTargetPane;
-import uz.ilyoskhurozov.anyroute.component.dialog.ComparingGraphDialog;
-import uz.ilyoskhurozov.anyroute.component.dialog.ConPropsDialog;
-import uz.ilyoskhurozov.anyroute.component.dialog.JustAlert;
-import uz.ilyoskhurozov.anyroute.component.dialog.SaveTopologyDialog;
+import uz.ilyoskhurozov.anyroute.component.dialog.*;
+import uz.ilyoskhurozov.anyroute.util.GlobalVariables;
 import uz.ilyoskhurozov.anyroute.util.ReliabilityGraphData;
 import uz.ilyoskhurozov.anyroute.util.TopologyData;
 import uz.ilyoskhurozov.anyroute.util.algo.Dijkstra;
@@ -142,11 +140,11 @@ public class Controller {
                                     String[] names = new String[]{connection.getSource(), connection.getTarget()};
                                     Arrays.sort(names);
                                     conPropsDialog.setTitle(names[0] + " - " + names[1]);
-                                    conPropsDialog.setProps(connection.getMetrics(), connection.getCableCount(), connection.getAvailability());
+                                    conPropsDialog.setProps(connection.getMetrics(), connection.getCableCount());
 
                                     conPropsDialog.showAndWait().ifPresent(
                                             conProps -> {
-                                                connection.setProps(conProps.metrics(), conProps.availability());
+                                                connection.setProps(conProps.metrics());
                                                 connection.setCableCount(conProps.count());
                                             }
                                     );
@@ -252,6 +250,9 @@ public class Controller {
                     String p2 = route.get(0);
 
                     AtomicLong dis = new AtomicLong(0);
+                    double graphAvailability = 0.0;
+
+                    ArrayList<Connection> connections = new ArrayList<>();
 
                     for (int i = 1; i < route.size(); i++) {
                         p1 = p2;
@@ -261,11 +262,14 @@ public class Controller {
                         if (connection == null) {
                             connection = connectionsTable.get(p2).get(p1);
                         }
+                        connections.add(connection);
                         connection.startSendingData(connection.getSource().equals(p1));
                         dis.addAndGet(connection.getMetrics());
                     }
+                    graphAvailability = Math.pow(GlobalVariables.routerAvailability, connections.size() + 1) * Math.pow(GlobalVariables.connectionAvailability, connections.size());
                     stopBtn.setDisable(false);
 
+                    double finalGraphAvailability = graphAvailability;
                     Platform.runLater(() -> {
                         long t = end.get() - begin.get();
                         long frac = 0;
@@ -289,7 +293,7 @@ public class Controller {
                         }
                         time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
                         distance.setText(String.valueOf(dis.get()));
-                        availability.setText("hey");
+                        availability.setText(String.format("%.3f", finalGraphAvailability));
                     });
                     resultsPane.setVisible(true);
                 }
@@ -373,6 +377,11 @@ public class Controller {
         showComparingGraphView(ReliabilityGraphData.comparingCableCount(
                 routerRel, cableCountFrom, cableCountTo, route.size()
         ));
+    }
+
+    @FXML
+    void setUpAvailability() {
+        new AvailabilityDialog().showAndWait();
     }
 
     @FXML

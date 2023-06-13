@@ -1,0 +1,44 @@
+FUNCTION_BLOCK model
+
+VAR_INPUT               // Define input variables
+    n_hops : REAL;
+    size_buffer : REAL;
+END_VAR
+
+VAR_OUTPUT             // Define output variable
+    quality : REAL;
+END_VAR
+
+FUZZIFY n_hops                                // Fuzzify input variable 'n_hops': {'short', 'medium' , 'long'}
+    TERM short := (0,1)(5,1)(7,0);
+    TERM medium := (5,0)(8,1)(13,0);
+    TERM long := (10,0)(13,1)(16,1);
+END_FUZZIFY
+
+FUZZIFY size_buffer                          // Fuzzify input variable 'size_buffer': { 'low', 'medium', 'high'}  
+    TERM low := (0,1)(30,1)(35,0);
+    TERM medium := (30,0)(35,1)(65,1)(70,0);
+    TERM high := (65,0)(80,1)(100,1);
+END_FUZZIFY
+
+
+DEFUZZIFY quality                           // Defuzzify output variable 'quality' : {'low', 'medium', 'high' }     
+    TERM low := (0,1)(30,1)(40,0);
+    TERM medium := (30,0)(50,1)(70,0);
+    TERM high := (55,0)(60,1)(100,0);
+    METHOD : COG;                           // Use 'Center Of Gravity' defuzzification method
+    DEFAULT := 0;                           // Default value is 0 (if no rule activates defuzzifier)
+END_DEFUZZIFY
+
+RULEBLOCK kuralblock1
+    AND : MIN;                              // Use 'min' for 'and' (also implicit use 'max' for 'or' to fulfill DeMorgan's Law)
+    ACT : MIN;                              // Use 'min' activation method  
+    ACCU : MAX;                             // Use 'max' accumulation method 
+    
+    RULE 1 : IF n_hops IS short OR size_buffer IS low THEN quality IS high;
+    RULE 2 : IF n_hops IS medium THEN quality IS medium;
+    RULE 3 : IF n_hops IS long AND size_buffer IS high THEN quality IS low;
+    
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK

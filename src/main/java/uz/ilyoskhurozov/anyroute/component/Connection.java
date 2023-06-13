@@ -11,12 +11,12 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import uz.ilyoskhurozov.anyroute.util.GlobalVariables;
 
 import java.util.ArrayList;
 
 public class Connection extends Group {
     private int metrics;
-    private int availability;
     private final Label label;
     private final ArrayList<Line> cables;
     private String source;
@@ -24,20 +24,18 @@ public class Connection extends Group {
     private boolean isSendingData = false;
     private Color defColor;
     private static final int DEFAULT_METRIC = 1;
-    private static final int DEFAULT_AVAILABILITY = 1;
     private DoubleBinding startX;
     private DoubleBinding startY;
     private DoubleBinding endX;
     private DoubleBinding endY;
 
     public Connection() {
-        this(DEFAULT_METRIC, DEFAULT_AVAILABILITY);
+        this(DEFAULT_METRIC);
     }
 
-    public Connection(int metrics, int availability) {
+    public Connection(int metrics) {
         this.metrics = metrics;
-        this.availability = availability;
-        label = new Label(metrics + "");
+        label = new Label(String.valueOf(metrics));
         label.setPadding(new Insets(0, 5, 0, 5));
         label.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
         cables = new ArrayList<>();
@@ -277,20 +275,14 @@ public class Connection extends Group {
         return metrics;
     }
 
-    public int getAvailability() {
-        return availability;
-    }
-
-
-    public void setProps(int metrics, int availability) {
+    public void setProps(int metrics) {
         this.metrics = metrics;
-        this.availability = availability;
         label.setText(Integer.toString(metrics));
     }
 
     @Override
     public String toString() {
         return "Cable{ metrics: " + metrics + ",\n"
-                + "availability: " + availability + "}";
+                + "availability: " + GlobalVariables.connectionAvailability + "}";
     }
 }

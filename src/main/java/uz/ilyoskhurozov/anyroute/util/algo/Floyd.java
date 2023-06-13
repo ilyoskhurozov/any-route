@@ -23,6 +23,7 @@ public class Floyd extends RouteAlgorithm {
         });
 
         //find routes
+        System.out.println("Routes" + routers);
         routers.forEach(
                 i -> routers.forEach(
                         col -> {
