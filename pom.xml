@@ -52,11 +52,6 @@
             <artifactId>ikonli-materialdesign2-pack</artifactId>
             <version>12.3.0</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.github.cschen1205</groupId>-->
-<!--            <artifactId>java-fuzzy-logic</artifactId>-->
-<!--            <version>1.0.1</version>-->
-<!--        </dependency>-->
     </dependencies>
 
     <build>
