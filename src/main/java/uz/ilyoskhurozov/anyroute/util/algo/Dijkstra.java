@@ -7,7 +7,7 @@ import java.util.*;
 public class Dijkstra extends RouteAlgorithm {
 
     @Override
-    public List<String> findRoute(TreeMap<String, TreeMap<String, Integer>> table, String source, String target, Double cableAvailability) {
+    public List<String> findRoute(TreeMap<String, TreeMap<String, Integer>> table, String source, String target) {
         PriorityQueue<Node> queue = new PriorityQueue<>(Comparator.comparing(Node::getDistance));
         HashMap<String, Node> nodeMap = new HashMap<>();
 
@@ -46,6 +46,10 @@ public class Dijkstra extends RouteAlgorithm {
                 cur = nodeMap.get(cur.getPrevious());
             }
 
+//            System.out.println("route" + route);
+//            List<String> temp = new ArrayList<>(List.of(route.toString().replace("[", "").replace("]", "").split(",")));
+//            temp.replaceAll(String::trim);
+//            System.out.println("list" + temp);
             return route;
         }
     }

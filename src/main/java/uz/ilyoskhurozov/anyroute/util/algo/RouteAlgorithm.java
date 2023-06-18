@@ -7,7 +7,6 @@ public abstract class RouteAlgorithm {
     public abstract List<String> findRoute(
             TreeMap<String, TreeMap<String, Integer>> table,
             String source,
-            String target,
-            Double cableAvailability
+            String target
     );
 }

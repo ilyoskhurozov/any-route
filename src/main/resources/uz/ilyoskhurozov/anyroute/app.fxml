@@ -156,8 +156,8 @@
     </right>
     <top>
         <MenuBar BorderPane.alignment="CENTER">
-            <Menu mnemonicParsing="false" text="Reliability graph">
-                <Menu mnemonicParsing="false" text="Cache">
+            <Menu mnemonicParsing="false" text="Topology parameters">
+                <Menu mnemonicParsing="false" text="Buffer cache">
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#saveTopology" text="Save topology to cache">
                             <accelerator>
@@ -173,17 +173,17 @@
                         </MenuItem>
                     </items>
                 </Menu>
-                <MenuItem mnemonicParsing="false" onAction="#graphByTopology" text="By topologies in cache">
+                <MenuItem mnemonicParsing="false" onAction="#graphByTopology" text="Open from buffer cache">
                     <accelerator>
                         <KeyCodeCombination alt="UP" code="T" control="DOWN" meta="UP" shift="DOWN" shortcut="UP"/>
                     </accelerator>
                 </MenuItem>
-                <MenuItem mnemonicParsing="false" onAction="#graphByCableCount" text="By cable count">
+                <MenuItem mnemonicParsing="false" onAction="#graphByCableCount" text="Input topology parameters">
                     <accelerator>
                         <KeyCodeCombination alt="UP" code="C" control="DOWN" meta="UP" shift="DOWN" shortcut="UP"/>
                     </accelerator>
                 </MenuItem>
-                <MenuItem mnemonicParsing="false" onAction="#setUpAvailability" text="Settings availability"/>
+                <MenuItem mnemonicParsing="false" onAction="#setUpAvailability" text="Availability values"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Algorithm block-schema">
                 <items>

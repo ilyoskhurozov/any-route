@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 public class Floyd extends RouteAlgorithm {
     @Override
-    public List<String> findRoute(TreeMap<String, TreeMap<String, Integer>> table, String source, String target, Double cableAvailability) {
+    public List<String> findRoute(TreeMap<String, TreeMap<String, Integer>> table, String source, String target) {
         Set<String> routers = table.keySet();
         //initialize prevTable
         TreeMap<String, TreeMap<String, String>> prevTable = new TreeMap<>();
