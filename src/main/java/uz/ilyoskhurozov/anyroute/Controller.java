@@ -606,12 +606,14 @@ public class Controller {
             fis.setVariable("availability", availability);
 
             fis.evaluate();
-            double outputValue = fis.getVariable("quality").defuzzify();
+            double outputValue = fis.getVariable("routeQuality").defuzzify();
 
             evaluatedList.add(new FuzzyData(routes.get(i), metric, availability, outputValue));
         }
-
+        evaluatedList.sort(Comparator.comparing(FuzzyData::getMetrics));
         evaluatedList.sort((o1, o2) -> o2.getFuzziedValue().compareTo(o1.getFuzziedValue()));
+
+        System.out.println(evaluatedList);
 
         if (evaluatedList.isEmpty()) {
             return null;
