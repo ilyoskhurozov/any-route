@@ -9,7 +9,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 
 public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
-    public record ConProps(int metrics, int count) {}
+    public record ConProps(int metrics, int count) {
+    }
 
     private final Spinner<Integer> metricsSpinner;
     private final Spinner<Integer> countSpinner;
@@ -25,7 +26,7 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
         countLabel.setFont(font);
 
         metricsSpinner = new Spinner<>(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(Integer.MIN_VALUE, Integer.MAX_VALUE, 1)
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1)
         );
         metricsSpinner.setEditable(true);
         metricsSpinner.getEditor().setFont(font);
@@ -46,8 +47,8 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(10));
         gridPane.getColumnConstraints().addAll(
-                new ColumnConstraints(100,100,100),
-                new ColumnConstraints(100,100,100)
+                new ColumnConstraints(200, 200, 200),
+                new ColumnConstraints(200, 200, 200)
         );
 
         getDialogPane().setContent(gridPane);
@@ -56,6 +57,7 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
             {
                 super.bind(metricsSpinner.valueProperty());
             }
+
             @Override
             protected boolean computeValue() {
                 return metricsSpinner.getValue() == 0;
@@ -67,7 +69,7 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
                 return new ConProps(
                         metricsSpinner.getValue(),
                         countSpinner.getValue()
-                );
+                        );
             }
             return null;
         });

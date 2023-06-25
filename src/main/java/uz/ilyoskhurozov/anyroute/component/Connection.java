@@ -11,6 +11,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import uz.ilyoskhurozov.anyroute.util.GlobalVariables;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,7 @@ public class Connection extends Group {
 
     public Connection(int metrics) {
         this.metrics = metrics;
-        label = new Label(metrics + "");
+        label = new Label(String.valueOf(metrics));
         label.setPadding(new Insets(0, 5, 0, 5));
         label.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
         cables = new ArrayList<>();
@@ -87,7 +88,7 @@ public class Connection extends Group {
     public void setCableCount(int n) {
         while (cables.size() > n) {
             getChildren().remove(
-                cables.remove(n)
+                    cables.remove(n)
             );
         }
         while (cables.size() < n) {
@@ -274,7 +275,6 @@ public class Connection extends Group {
         return metrics;
     }
 
-
     public void setProps(int metrics) {
         this.metrics = metrics;
         label.setText(Integer.toString(metrics));
@@ -282,6 +282,7 @@ public class Connection extends Group {
 
     @Override
     public String toString() {
-        return "Cable{" + metrics + "}";
+        return "Cable{ metrics: " + metrics + ",\n"
+                + "availability: " + GlobalVariables.connectionAvailability + "}";
     }
 }

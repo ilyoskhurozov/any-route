@@ -15,14 +15,10 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import uz.ilyoskhurozov.anyroute.component.ComparingGraphView;
-import uz.ilyoskhurozov.anyroute.component.Connection;
-import uz.ilyoskhurozov.anyroute.component.Router;
-import uz.ilyoskhurozov.anyroute.component.SourceTargetPane;
-import uz.ilyoskhurozov.anyroute.component.dialog.ComparingGraphDialog;
-import uz.ilyoskhurozov.anyroute.component.dialog.ConPropsDialog;
-import uz.ilyoskhurozov.anyroute.component.dialog.JustAlert;
-import uz.ilyoskhurozov.anyroute.component.dialog.SaveTopologyDialog;
+import net.sourceforge.jFuzzyLogic.FIS;
+import uz.ilyoskhurozov.anyroute.component.*;
+import uz.ilyoskhurozov.anyroute.component.dialog.*;
+import uz.ilyoskhurozov.anyroute.util.GlobalVariables;
 import uz.ilyoskhurozov.anyroute.util.ReliabilityGraphData;
 import uz.ilyoskhurozov.anyroute.util.TopologyData;
 import uz.ilyoskhurozov.anyroute.util.algo.Dijkstra;
@@ -77,8 +73,11 @@ public class Controller {
     private Label distance;
 
     @FXML
+    private Label availability;
+
+    @FXML
     private void initialize() {
-        algorithms.getItems().addAll("Dijkstra", "Floyd", "Bellman-Ford");
+        algorithms.getItems().addAll("Dijkstra", "Floyd", "Bellman-Ford", "Fuzzy logic");
         algorithms.getSelectionModel().selectFirst();
 
         connectionsTable = new TreeMap<>();
@@ -101,28 +100,17 @@ public class Controller {
                         desk.getChildren().add(currentConnection);
 
                         currentConnection.setSource(router);
-                        currentConnection.setEndXY(
-                                router.getLayoutX() + mouseEvent.getX(),
-                                router.getLayoutY() + mouseEvent.getY()
-                        );
+                        currentConnection.setEndXY(router.getLayoutX() + mouseEvent.getX(), router.getLayoutY() + mouseEvent.getY());
 
-                        desk.setOnMouseMoved(event -> currentConnection.setEndXY(
-                                event.getX() + Math.signum(currentConnection.getStartX() - currentConnection.getEndX()),
-                                event.getY() + Math.signum(currentConnection.getStartY() - currentConnection.getEndY())
-                        ));
+                        desk.setOnMouseMoved(event -> currentConnection.setEndXY(event.getX() + Math.signum(currentConnection.getStartX() - currentConnection.getEndX()), event.getY() + Math.signum(currentConnection.getStartY() - currentConnection.getEndY())));
                     } else {
-                        if (
-                                connectionsTable.get(currentConnection.getSource()).get(routerName) != null ||
-                                        connectionsTable.get(routerName).get(currentConnection.getSource()) != null
-                        ) {
+                        if (connectionsTable.get(currentConnection.getSource()).get(routerName) != null || connectionsTable.get(routerName).get(currentConnection.getSource()) != null) {
                             //forbid doubling connection
                             return;
                         }
                         currentConnection.setTarget(router);
 
-                        if (currentConnection.getEndX() == currentConnection.getStartX() &&
-                                currentConnection.getEndY() == currentConnection.getStartY()
-                        ) {
+                        if (currentConnection.getEndX() == currentConnection.getStartX() && currentConnection.getEndY() == currentConnection.getStartY()) {
                             desk.getChildren().remove(currentConnection);
                         } else {
                             connectionsTable.get(currentConnection.getSource()).put(currentConnection.getTarget(), currentConnection);
@@ -141,12 +129,10 @@ public class Controller {
                                     conPropsDialog.setTitle(names[0] + " - " + names[1]);
                                     conPropsDialog.setProps(connection.getMetrics(), connection.getCableCount());
 
-                                    conPropsDialog.showAndWait().ifPresent(
-                                            conProps -> {
-                                                connection.setProps(conProps.metrics());
-                                                connection.setCableCount(conProps.count());
-                                            }
-                                    );
+                                    conPropsDialog.showAndWait().ifPresent(conProps -> {
+                                        connection.setProps(conProps.metrics());
+                                        connection.setCableCount(conProps.count());
+                                    });
                                 }
                             });
                         }
@@ -161,7 +147,7 @@ public class Controller {
 
                     routersMap.keySet().forEach(r -> {
                         Connection connection = connectionsTable.get(r).remove(routerName);
-                        if (connection == null){
+                        if (connection == null) {
                             connection = connectionsTable.get(routerName).remove(r);
                         }
 
@@ -205,10 +191,7 @@ public class Controller {
         Font font = new Font("JetBrainsMono Nerd Font", 16);
 
         SourceTargetPane stPane = new SourceTargetPane(routersMap.keySet(), font);
-        stPane.getColumnConstraints().addAll(
-                new ColumnConstraints(100,100,100),
-                new ColumnConstraints(100,100,100)
-        );
+        stPane.getColumnConstraints().addAll(new ColumnConstraints(100, 100, 100), new ColumnConstraints(100, 100, 100));
 
         Dialog<Map<String, String>> stDialog = new Dialog<>();
         stDialog.getDialogPane().setContent(stPane);
@@ -245,49 +228,147 @@ public class Controller {
                 if (route == null) {
                     Platform.runLater(() -> new JustAlert(JustAlert.Message.ROUTE_NOT_FOUND).showAndWait());
                 } else {
-                    String p1;
-                    String p2 = route.get(0);
+                    if (algoName.equals("Bellman-Ford") || algoName.equals("Floyd") || algoName.equals("Dijkstra")) {
 
-                    AtomicLong dis = new AtomicLong(0);
+                        String p1;
+                        String p2 = route.get(0);
 
-                    for (int i = 1; i < route.size(); i++) {
-                        p1 = p2;
-                        p2 = route.get(i);
+                        AtomicLong dis = new AtomicLong(0);
+                        double graphAvailability;
 
-                        Connection connection = connectionsTable.get(p1).get(p2);
-                        if (connection == null) {
-                            connection = connectionsTable.get(p2).get(p1);
+                        ArrayList<Connection> connections = new ArrayList<>();
+
+                        for (int i = 1; i < route.size(); i++) {
+                            p1 = p2;
+                            p2 = route.get(i);
+
+                            Connection connection = connectionsTable.get(p1).get(p2);
+                            if (connection == null) {
+                                connection = connectionsTable.get(p2).get(p1);
+                            }
+                            connections.add(connection);
+                            connection.startSendingData(connection.getSource().equals(p1));
+                            dis.addAndGet(connection.getMetrics());
                         }
-                        connection.startSendingData(connection.getSource().equals(p1));
-                        dis.addAndGet(connection.getMetrics());
-                    }
-                    stopBtn.setDisable(false);
+                        graphAvailability = Math.pow(GlobalVariables.routerAvailability, connections.size() + 1) * Math.pow(GlobalVariables.connectionAvailability, connections.size());
+                        stopBtn.setDisable(false);
 
-                    Platform.runLater(() -> {
-                        long t = end.get() - begin.get();
-                        long frac = 0;
-                        String unit = "ns";
-                        if (t > 1000) {
-                            frac = t % 1000;
-                            t /= 1000;
-                            unit = "mks";
-
+                        double finalGraphAvailability = graphAvailability;
+                        Platform.runLater(() -> {
+                            long t = end.get() - begin.get();
+                            long frac = 0;
+                            String unit = "ns";
                             if (t > 1000) {
                                 frac = t % 1000;
                                 t /= 1000;
-                                unit = "ms";
+                                unit = "mks";
 
                                 if (t > 1000) {
                                     frac = t % 1000;
                                     t /= 1000;
-                                    unit = "s";
+                                    unit = "ms";
+
+                                    if (t > 1000) {
+                                        frac = t % 1000;
+                                        t /= 1000;
+                                        unit = "s";
+                                    }
                                 }
                             }
+                            time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
+                            distance.setText(String.valueOf(dis.get()));
+                            availability.setText(String.format("%.5f", finalGraphAvailability));
+                        });
+                        resultsPane.setVisible(true);
+                    } else {
+                        long mStartTime = System.currentTimeMillis();
+
+                        List<Double> availabilities = new ArrayList<>();
+                        List<Long> metrics = new ArrayList<>();
+                        List<List<String>> routes = new ArrayList<>();
+
+                        for (String s : route) {
+                            routes.add(stringToStringList(s));
                         }
-                        time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
-                        distance.setText(dis.get() + "");
-                    });
-                    resultsPane.setVisible(true);
+
+                        for (List<String> mRoute : routes) {
+                            String p1;
+                            String p2 = mRoute.get(0);
+
+                            AtomicLong dis = new AtomicLong(0);
+                            double graphAvailability;
+
+                            ArrayList<Connection> connections = new ArrayList<>();
+
+                            for (int i = 1; i < mRoute.size(); i++) {
+                                p1 = p2;
+                                p2 = mRoute.get(i);
+
+                                Connection connection = connectionsTable.get(p1).get(p2);
+                                if (connection == null) {
+                                    connection = connectionsTable.get(p2).get(p1);
+                                }
+                                connections.add(connection);
+                                //connection.startSendingData(connection.getSource().equals(p1));
+                                dis.addAndGet(connection.getMetrics());
+                            }
+
+                            graphAvailability = Math.floor(Math.pow(GlobalVariables.routerAvailability, (connections.size() + 1)) * Math.pow(GlobalVariables.connectionAvailability, connections.size()) * 100000) / 100000;
+                            availabilities.add(graphAvailability);
+                            metrics.add(dis.longValue());
+                        }
+
+                        // start average route
+                        FuzzyData fuzzyData = findRouteWithFuzzyLogic(routes, metrics, availabilities);
+
+                        if (fuzzyData != null) {
+
+                            List<String> fuzzyRoute = fuzzyData.getRoute();
+
+                            String p1;
+                            String p2 = fuzzyRoute.get(0);
+
+                            for (int i = 1; i < fuzzyRoute.size(); i++) {
+                                p1 = p2;
+                                p2 = fuzzyRoute.get(i);
+
+                                Connection connection = connectionsTable.get(p1).get(p2);
+                                if (connection == null) {
+                                    connection = connectionsTable.get(p2).get(p1);
+                                }
+                                connection.startSendingData(connection.getSource().equals(p1));
+                            }
+
+                            stopBtn.setDisable(false);
+
+                            Platform.runLater(() -> {
+                                long t = end.get() - begin.get() + mStartTime + System.currentTimeMillis();
+                                long frac = 0;
+                                String unit = "ns";
+                                if (t > 1000) {
+                                    frac = t % 1000;
+                                    t /= 1000;
+                                    unit = "mks";
+
+                                    if (t > 1000) {
+                                        frac = t % 1000;
+                                        t /= 1000;
+                                        unit = "ms";
+
+                                        if (t > 1000) {
+                                            frac = t % 1000;
+                                            t /= 1000;
+                                            unit = "s";
+                                        }
+                                    }
+                                }
+                                time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
+                                distance.setText(String.valueOf(fuzzyData.getMetrics()));
+                                availability.setText(String.format("%.5f", fuzzyData.getAvailability()));
+                            });
+                            resultsPane.setVisible(true);
+                        }
+                    }
                 }
 
                 findRouteBtn.setDisable(false);
@@ -300,11 +381,7 @@ public class Controller {
 
     @FXML
     void stopAnimation() {
-        desk.getChildren()
-                .parallelStream()
-                .filter(node -> node instanceof Connection)
-                .map(node -> (Connection) node)
-                .forEach(Connection::stopSendingData);
+        desk.getChildren().parallelStream().filter(node -> node instanceof Connection).map(node -> (Connection) node).forEach(Connection::stopSendingData);
 
         stopBtn.setDisable(true);
     }
@@ -319,9 +396,7 @@ public class Controller {
             return;
         }
 
-        Optional<Map<String, Object>> dataOpt = new ComparingGraphDialog(
-                topologyDataCache.keySet(), true
-        ).showAndWait();
+        Optional<Map<String, Object>> dataOpt = new ComparingGraphDialog(topologyDataCache.keySet(), true).showAndWait();
 
         if (dataOpt.isEmpty()) return;
 
@@ -329,13 +404,9 @@ public class Controller {
 
         double routerRel = ((double) data.get("routerRel"));
         List<String> topologyNames = (List<String>) data.get("topologies");
-        List<TopologyData> topologies = topologyDataCache.values().stream()
-                .filter(topologyData -> topologyNames.contains(topologyData.name()))
-                .collect(Collectors.toList());
+        List<TopologyData> topologies = topologyDataCache.values().stream().filter(topologyData -> topologyNames.contains(topologyData.name())).collect(Collectors.toList());
 
-        showComparingGraphView(
-                ReliabilityGraphData.comparingTopologies(routerRel, topologies)
-        );
+        showComparingGraphView(ReliabilityGraphData.comparingTopologies(routerRel, topologies));
     }
 
     @FXML
@@ -345,9 +416,7 @@ public class Controller {
             return;
         }
 
-        Optional<Map<String, Object>> dataOpt = new ComparingGraphDialog(
-                routersMap.keySet(), false
-        ).showAndWait();
+        Optional<Map<String, Object>> dataOpt = new ComparingGraphDialog(routersMap.keySet(), false).showAndWait();
 
         if (dataOpt.isEmpty()) return;
 
@@ -366,9 +435,12 @@ public class Controller {
             return;
         }
 
-        showComparingGraphView(ReliabilityGraphData.comparingCableCount(
-                routerRel, cableCountFrom, cableCountTo, route.size()
-        ));
+        showComparingGraphView(ReliabilityGraphData.comparingCableCount(routerRel, cableCountFrom, cableCountTo, route.size()));
+    }
+
+    @FXML
+    void setUpAvailability() {
+        new AvailabilityDialog().showAndWait();
     }
 
     @FXML
@@ -394,34 +466,24 @@ public class Controller {
                 return;
             }
 
-            topologyDataCache.put(
-                    name,
-                    new TopologyData(
-                            name,
-                            source,
-                            target,
-                            getIsConnectedTable()
-                    )
-            );
+            topologyDataCache.put(name, new TopologyData(name, source, target, getIsConnectedTable()));
             clearDesk();
         });
     }
 
     @FXML
     void clearCache() {
-        new JustAlert(JustAlert.Message.DELETE_TOPOLOGY_CACHE_CONFIRMATION)
-                .showAndWait()
-                .ifPresent(buttonType -> {
-                    if (buttonType == ButtonType.OK) {
-                        topologyDataCache.clear();
-                    }
-                });
+        new JustAlert(JustAlert.Message.DELETE_TOPOLOGY_CACHE_CONFIRMATION).showAndWait().ifPresent(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                topologyDataCache.clear();
+            }
+        });
     }
 
     @FXML
     void showSchema(ActionEvent event) {
         String algo = ((MenuItem) event.getTarget()).getText();
-        InputStream schemaFile = App.class.getResourceAsStream("/images/block-schema/"+algo+".png");
+        InputStream schemaFile = App.class.getResourceAsStream("/images/block-schema/" + algo + ".png");
 
         if (schemaFile == null) {
             new JustAlert(JustAlert.Message.RUNTIME_ERROR).showAndWait();
@@ -432,11 +494,11 @@ public class Controller {
         Stage stage = new Stage();
 
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(algo+" block-schema");
+        stage.setTitle(algo + " block-schema");
 
         ScrollPane root = new ScrollPane(new ImageView(image));
         double height = Screen.getPrimary().getBounds().getHeight() * 0.6;
-        stage.setScene(new Scene(root, image.getWidth()+16, height));
+        stage.setScene(new Scene(root, image.getWidth() + 16, height));
 
         stage.showAndWait();
     }
@@ -445,30 +507,12 @@ public class Controller {
 
     public void bindKeys() {
         Scene scene = desk.getScene();
-        scene.getAccelerators().put(
-                new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN),
-                () -> routerBtn.setSelected(true)
-        );
-        scene.getAccelerators().put(
-                new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN),
-                () -> cableBtn.setSelected(true)
-        );
-        scene.getAccelerators().put(
-                new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
-                () -> deleteBtn.setSelected(true)
-        );
-        scene.getAccelerators().put(
-                new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),
-                this::findRoute
-        );
-        scene.getAccelerators().put(
-                new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.CONTROL_ANY),
-                this::cancel
-        );
-        scene.getAccelerators().put(
-                new KeyCodeCombination(KeyCode.F1),
-                () -> new JustAlert(JustAlert.Message.SOURCE_CODE).showAndWait()
-        );
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN), () -> routerBtn.setSelected(true));
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN), () -> cableBtn.setSelected(true));
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN), () -> deleteBtn.setSelected(true));
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN), this::findRoute);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.ESCAPE, KeyCombination.CONTROL_ANY), this::cancel);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F1), () -> new JustAlert(JustAlert.Message.SOURCE_CODE).showAndWait());
     }
 
     private void cancel() {
@@ -495,7 +539,8 @@ public class Controller {
                 table.get(r1).put(r2, con.getMetrics());
 
                 if (isUndirected) {
-                    if (con.getMetrics() < 0) throw new IllegalArgumentException("Negative metrics on undirected connection");
+                    if (con.getMetrics() < 0)
+                        throw new IllegalArgumentException("Negative metrics on undirected connection");
                     table.get(r2).put(r1, con.getMetrics());
                 }
             }
@@ -521,12 +566,59 @@ public class Controller {
     }
 
     private void showComparingGraphView(Map<String, double[]> chartData) {
-        new ComparingGraphView(
-                chartData,
-                new double[] {
-                        0.99, 0.99099, 0.99198, 0.99297, 0.99396, 0.99495,
-                        0.99594, 0.99693, 0.99792, 0.99891, 0.9999,
-                }
-        ).showAndWait();
+        new ComparingGraphView(chartData, new double[]{0.99, 0.99099, 0.99198, 0.99297, 0.99396, 0.99495, 0.99594, 0.99693, 0.99792, 0.99891, 0.9999,}).showAndWait();
+    }
+
+    private List<String> stringToStringList(String route) {
+        String mRoute = route.replace("[", "").replace("]", "");
+        List<String> temp = new ArrayList<>(List.of(mRoute.replace("[", "").replace("]", "").split(",")));
+        temp.replaceAll(String::trim);
+        return temp;
+    }
+
+    private FuzzyData findRouteWithFuzzyLogic(List<List<String>> routes, List<Long> metrics, List<Double> availabilities) {
+
+        List<FuzzyData> evaluatedList = new ArrayList<>();
+
+        String fileName = "C:\\Users\\Hp\\IdeaProjects\\any-route\\src\\main\\java\\uz\\ilyoskhurozov\\anyroute\\util\\Model.fcl";
+        FIS fis = FIS.load(fileName, true);
+
+        if (fis == null) {
+            System.err.println("Cannot load file: " + fileName);
+            return null;
+        }
+
+        // Set up an array of input values and their corresponding membership degrees
+        double[][] inputValues = new double[metrics.size()][2];
+
+        for (int i = 0; i < inputValues.length; i++) {
+            inputValues[i][0] = metrics.get(i);
+            inputValues[i][1] = availabilities.get(i);
+        }
+
+        // Set inputs
+        for (int i = 0; i < inputValues.length; i++) {
+
+            double metric = inputValues[i][0];
+            double availability = inputValues[i][1];
+
+            fis.setVariable("metrics", metric);
+            fis.setVariable("availability", availability);
+
+            fis.evaluate();
+            double outputValue = fis.getVariable("routeQuality").defuzzify();
+
+            evaluatedList.add(new FuzzyData(routes.get(i), metric, availability, outputValue));
+        }
+        evaluatedList.sort(Comparator.comparing(FuzzyData::getMetrics));
+        evaluatedList.sort((o1, o2) -> o2.getFuzziedValue().compareTo(o1.getFuzziedValue()));
+
+        System.out.println(evaluatedList);
+
+        if (evaluatedList.isEmpty()) {
+            return null;
+        } else {
+            return evaluatedList.get(0);
+        }
     }
 }

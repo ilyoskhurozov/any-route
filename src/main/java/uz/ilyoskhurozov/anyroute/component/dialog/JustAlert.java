@@ -20,7 +20,7 @@ public class JustAlert extends Alert {
         public final AlertType type;
         public final String text;
 
-        Message(AlertType type, String text){
+        Message(AlertType type, String text) {
             this.type = type;
             this.text = text;
         }

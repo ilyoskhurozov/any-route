@@ -4,6 +4,7 @@ module uz.ilyoskhurozov.anyroute {
 
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign2;
+    requires jFuzzyLogic;
 
     opens uz.ilyoskhurozov.anyroute to javafx.fxml;
     exports uz.ilyoskhurozov.anyroute;

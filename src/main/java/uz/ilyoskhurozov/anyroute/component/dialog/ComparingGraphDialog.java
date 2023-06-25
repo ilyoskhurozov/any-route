@@ -9,6 +9,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import uz.ilyoskhurozov.anyroute.component.SourceTargetPane;
+import uz.ilyoskhurozov.anyroute.util.GlobalVariables;
 
 import java.util.List;
 import java.util.Map;
@@ -25,21 +26,31 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(10));
         gridPane.getColumnConstraints().addAll(
-                new ColumnConstraints(200,200,200),
-                new ColumnConstraints(100,100,100)
+                new ColumnConstraints(200, 200, 200),
+                new ColumnConstraints(100, 100, 100)
         );
 
         Font font = new Font("JetBrainsMono Nerd Font", 16);
 
-        Label routerReliabilityLabel = new Label("Cable's reliability (0.xxxx):");
+        Label routerReliabilityLabel = new Label("Router's reliability (0.xxx):");
+        Label connectionReliabilityLabel = new Label("Connection's reliability (0.xxx):");
 
         Spinner<Integer> routerReliability = new Spinner<>(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(9900, 9999, 9990)
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1000, 999)
         );
+
+        Spinner<Integer> connectionReliability = new Spinner<>(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1000, 999)
+        );
+
         routerReliability.setEditable(true);
+        connectionReliability.setEditable(true);
 
         routerReliabilityLabel.setFont(font);
         routerReliability.getEditor().setFont(font);
+
+        connectionReliabilityLabel.setFont(font);
+        connectionReliability.getEditor().setFont(font);
 
         gridPane.add(routerReliabilityLabel, 0, 0);
         gridPane.add(routerReliability, 1, 0);
@@ -69,6 +80,7 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
                                     .toArray(BooleanProperty[]::new)
                     );
                 }
+
                 @Override
                 protected boolean computeValue() {
                     return checks.parallelStream().filter(CheckBox::isSelected).count() < 2;
@@ -77,8 +89,10 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
 
             setResultConverter(buttonType -> {
                 if (buttonType == ButtonType.OK) {
+                    GlobalVariables.routerAvailability = routerReliability.getValue() / 1000f;
+                    GlobalVariables.connectionAvailability = connectionReliability.getValue() / 1000f;
                     return Map.of(
-                            "routerRel", routerReliability.getValue() / 10000.0,
+                            "routerRel", routerReliability.getValue() / 1000.0,
                             "topologies", checks.stream()
                                     .filter(CheckBox::isSelected)
                                     .map(CheckBox::getText)
@@ -120,6 +134,7 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
                 {
                     super.bind(ccFromSpinner.valueProperty(), ccFromSpinner.valueProperty());
                 }
+
                 @Override
                 protected boolean computeValue() {
                     return ccToSpinner.getValue() - ccFromSpinner.getValue() < 2;

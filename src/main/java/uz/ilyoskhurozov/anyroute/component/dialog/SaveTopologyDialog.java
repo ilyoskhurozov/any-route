@@ -23,9 +23,8 @@ public class SaveTopologyDialog extends Dialog<Map<String, String>> {
 
         Label nameLabel = new Label("Name:");
         nameLabel.setFont(font);
-        TextField nameField = new TextField("Topology"+n);
+        TextField nameField = new TextField("Topology" + n);
         SourceTargetPane stPane = new SourceTargetPane(routerNamesList, font);
-
 
         GridPane gridPane = new GridPane();
         gridPane.add(nameLabel, 0, 0);
@@ -36,8 +35,8 @@ public class SaveTopologyDialog extends Dialog<Map<String, String>> {
         gridPane.setVgap(10);
         gridPane.setPadding(new Insets(10));
         gridPane.getColumnConstraints().addAll(
-                new ColumnConstraints(100,100,100),
-                new ColumnConstraints(100,100,100)
+                new ColumnConstraints(100, 100, 100),
+                new ColumnConstraints(100, 100, 100)
         );
         stPane.getColumnConstraints().addAll(gridPane.getColumnConstraints());
 
@@ -47,6 +46,7 @@ public class SaveTopologyDialog extends Dialog<Map<String, String>> {
             {
                 super.bind(nameField.textProperty());
             }
+
             @Override
             protected boolean computeValue() {
                 return nameField.getText().isBlank();

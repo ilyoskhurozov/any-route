@@ -17,7 +17,7 @@ public class SourceTargetPane extends GridPane {
         this.routerNames = routerNames;
         Label sourceLabel = new Label("Source:");
         sourceLabel.setFont(labelFont);
-        Label targetLabel = new Label("Target:");
+        Label targetLabel = new Label("Destination:");
         targetLabel.setFont(labelFont);
 
         targetBox = new ComboBox<>();
@@ -45,9 +45,6 @@ public class SourceTargetPane extends GridPane {
     }
 
     public Map<String, String> getValue() {
-        return Map.of(
-                "source", sourceBox.getValue(),
-                "target", targetBox.getValue()
-        );
+        return Map.of("source", sourceBox.getValue(), "target", targetBox.getValue());
     }
 }
