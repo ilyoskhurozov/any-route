@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 public class Connection extends Group {
     private int metrics;
+    private int cableAvailability;
     private final Label label;
     private final ArrayList<Line> cables;
     private String source;
@@ -24,16 +25,18 @@ public class Connection extends Group {
     private boolean isSendingData = false;
     private Color defColor;
     private static final int DEFAULT_METRIC = 1;
+    private static final int DEFAULT_AVAILABILITY = 1000;
     private DoubleBinding startX;
     private DoubleBinding startY;
     private DoubleBinding endX;
     private DoubleBinding endY;
 
     public Connection() {
-        this(DEFAULT_METRIC);
+        this(DEFAULT_METRIC, DEFAULT_AVAILABILITY);
     }
 
-    public Connection(int metrics) {
+    public Connection(int metrics, int cableAvailability) {
+        this.cableAvailability = cableAvailability;
         this.metrics = metrics;
         label = new Label(String.valueOf(metrics));
         label.setPadding(new Insets(0, 5, 0, 5));
@@ -275,8 +278,13 @@ public class Connection extends Group {
         return metrics;
     }
 
-    public void setProps(int metrics) {
+    public int getCableAvailability() {
+        return cableAvailability;
+    }
+
+    public void setProps(int metrics, int cableAvailability) {
         this.metrics = metrics;
+        this.cableAvailability = cableAvailability;
         label.setText(Integer.toString(metrics));
     }
 
