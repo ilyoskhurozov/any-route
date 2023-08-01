@@ -178,7 +178,7 @@
                         <KeyCodeCombination alt="UP" code="T" control="DOWN" meta="UP" shift="DOWN" shortcut="UP"/>
                     </accelerator>
                 </MenuItem>
-                <MenuItem mnemonicParsing="false" onAction="#graphByCableCount" text="Input topology parameters">
+                <MenuItem mnemonicParsing="false" onAction="#graphByCableCount" text="Table availability">
                     <accelerator>
                         <KeyCodeCombination alt="UP" code="C" control="DOWN" meta="UP" shift="DOWN" shortcut="UP"/>
                     </accelerator>
