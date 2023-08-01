@@ -291,6 +291,6 @@ public class Connection extends Group {
     @Override
     public String toString() {
         return "Cable{ metrics: " + metrics + ",\n"
-                + "availability: " + GlobalVariables.connectionAvailability + "}";
+                + "availability: " + cableAvailability + "}";
     }
 }

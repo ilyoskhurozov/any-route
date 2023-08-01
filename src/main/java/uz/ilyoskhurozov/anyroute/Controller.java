@@ -77,7 +77,7 @@ public class Controller {
 
     @FXML
     private void initialize() {
-        algorithms.getItems().addAll("Dijkstra", "Floyd", "Bellman-Ford", "Fuzzy logic", "Fuzzy logic2");
+        algorithms.getItems().addAll("Dijkstra", "Floyd", "Bellman-Ford", "Default fuzzy logic", "Real fuzzy logic");
         algorithms.getSelectionModel().selectFirst();
 
         connectionsTable = new TreeMap<>();
@@ -280,7 +280,7 @@ public class Controller {
                             availability.setText(String.format("%.5f", finalGraphAvailability));
                         });
                         resultsPane.setVisible(true);
-                    } else if (algoName.equals("Fuzzy logic")) {
+                    } else if (algoName.equals("Default fuzzy logic")) {
                         long mStartTime = System.currentTimeMillis();
 
                         List<Double> availabilities = new ArrayList<>();
@@ -368,7 +368,9 @@ public class Controller {
                             });
                             resultsPane.setVisible(true);
                         }
-                    } else if (algoName.equals("Fuzzy logic2")) {
+                    } else if (algoName.equals("Real fuzzy logic")) {
+
+                        // fuzzy logic with difference available
 
                         long mStartTime = System.currentTimeMillis();
 
@@ -385,7 +387,7 @@ public class Controller {
                             String p2 = mRoute.get(0);
 
                             AtomicLong dis = new AtomicLong(0);
-                            double graphAvailability;
+                            double graphAvailability = 1.0;
 
                             ArrayList<Connection> connections = new ArrayList<>();
 
@@ -402,9 +404,12 @@ public class Controller {
                                 dis.addAndGet(connection.getMetrics());
                             }
                             System.out.println(connections);
-                            graphAvailability = Math.floor(Math.pow(GlobalVariables.routerAvailability, (connections.size() + 1)) * Math.pow(GlobalVariables.connectionAvailability, connections.size()) * 100000) / 100000;
+                            for (Connection connection : connections) {
+                                graphAvailability *= (connection.getCableAvailability() / 1000d);
+                            }
+
+                            graphAvailability *= Math.floor(Math.pow(GlobalVariables.routerAvailability, (connections.size() + 1)) * 100000) / 100000;
                             availabilities.add(graphAvailability);
-                            // todo find route availability by each cable
                             metrics.add(dis.longValue());
                         }
 

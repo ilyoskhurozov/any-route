@@ -23,10 +23,10 @@ public class ConPropsDialog extends Dialog<ConPropsDialog.ConProps> {
         Label metricsLabel = new Label("Metrics:");
         metricsLabel.setFont(font);
 
-        Label availabilityLabel = new Label("Availability(.xxx9):");
+        Label availabilityLabel = new Label("Availability(.xxx):");
         availabilityLabel.setFont(font);
 
-        Label countLabel = new Label("Count:");
+        Label countLabel = new Label("Cable count:");
         countLabel.setFont(font);
 
         metricsSpinner = new Spinner<>(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 1));
