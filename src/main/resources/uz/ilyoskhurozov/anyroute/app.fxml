@@ -190,6 +190,7 @@
                     <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Dijkstra"/>
                     <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Floyd"/>
                     <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Bellman-Ford"/>
+                    <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Fuzzy-Logic"/>
                 </items>
             </Menu>
         </MenuBar>
