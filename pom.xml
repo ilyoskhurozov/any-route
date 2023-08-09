@@ -75,8 +75,8 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>uz.ilyoskhurozov.anyroute/uz.ilyoskhurozov.anyroute.App</mainClass>
-                            <launcher>Any route</launcher>
-                            <jlinkImageName>Any route</jlinkImageName>
+                            <launcher>Fuzzy route</launcher>
+                            <jlinkImageName>Fuzzy route</jlinkImageName>
                             <noManPages>true</noManPages>
                             <stripDebug>true</stripDebug>
                             <noHeaderFiles>true</noHeaderFiles>

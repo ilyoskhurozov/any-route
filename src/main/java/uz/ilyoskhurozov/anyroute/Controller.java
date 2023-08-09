@@ -77,7 +77,7 @@ public class Controller {
 
     @FXML
     private void initialize() {
-        algorithms.getItems().addAll("Dijkstra", "Floyd", "Bellman-Ford", "Fuzzy logic");
+        algorithms.getItems().addAll("Dijkstra", "Floyd", "Bellman-Ford", "Default fuzzy logic", "Real fuzzy logic");
         algorithms.getSelectionModel().selectFirst();
 
         connectionsTable = new TreeMap<>();
@@ -127,10 +127,10 @@ public class Controller {
                                     String[] names = new String[]{connection.getSource(), connection.getTarget()};
                                     Arrays.sort(names);
                                     conPropsDialog.setTitle(names[0] + " - " + names[1]);
-                                    conPropsDialog.setProps(connection.getMetrics(), connection.getCableCount());
+                                    conPropsDialog.setProps(connection.getMetrics(), connection.getCableAvailability(), connection.getCableCount());
 
                                     conPropsDialog.showAndWait().ifPresent(conProps -> {
-                                        connection.setProps(conProps.metrics());
+                                        connection.setProps(conProps.metrics(), conProps.availability());
                                         connection.setCableCount(conProps.count());
                                     });
                                 }
@@ -280,7 +280,7 @@ public class Controller {
                             availability.setText(String.format("%.5f", finalGraphAvailability));
                         });
                         resultsPane.setVisible(true);
-                    } else {
+                    } else if (algoName.equals("Default fuzzy logic")) {
                         long mStartTime = System.currentTimeMillis();
 
                         List<Double> availabilities = new ArrayList<>();
@@ -368,6 +368,103 @@ public class Controller {
                             });
                             resultsPane.setVisible(true);
                         }
+                    } else if (algoName.equals("Real fuzzy logic")) {
+
+                        // fuzzy logic with difference available
+
+                        long mStartTime = System.currentTimeMillis();
+
+                        List<Double> availabilities = new ArrayList<>();
+                        List<Long> metrics = new ArrayList<>();
+                        List<List<String>> routes = new ArrayList<>();
+
+                        for (String s : route) {
+                            routes.add(stringToStringList(s));
+                        }
+
+                        for (List<String> mRoute : routes) {
+                            String p1;
+                            String p2 = mRoute.get(0);
+
+                            AtomicLong dis = new AtomicLong(0);
+                            double graphAvailability = 1.0;
+
+                            ArrayList<Connection> connections = new ArrayList<>();
+
+                            for (int i = 1; i < mRoute.size(); i++) {
+                                p1 = p2;
+                                p2 = mRoute.get(i);
+
+                                Connection connection = connectionsTable.get(p1).get(p2);
+                                if (connection == null) {
+                                    connection = connectionsTable.get(p2).get(p1);
+                                }
+                                connections.add(connection);
+                                //connection.startSendingData(connection.getSource().equals(p1));
+                                dis.addAndGet(connection.getMetrics());
+                            }
+                            System.out.println(connections);
+                            for (Connection connection : connections) {
+                                graphAvailability *= (connection.getCableAvailability() / 1000d);
+                            }
+
+                            graphAvailability *= Math.floor(Math.pow(GlobalVariables.routerAvailability, (connections.size() + 1)) * 100000) / 100000;
+                            availabilities.add(graphAvailability);
+                            metrics.add(dis.longValue());
+                        }
+
+                        // start average route
+                        FuzzyData fuzzyData = findRouteWithFuzzyLogic(routes, metrics, availabilities);
+
+                        if (fuzzyData != null) {
+
+                            List<String> fuzzyRoute = fuzzyData.getRoute();
+
+                            String p1;
+                            String p2 = fuzzyRoute.get(0);
+
+                            for (int i = 1; i < fuzzyRoute.size(); i++) {
+                                p1 = p2;
+                                p2 = fuzzyRoute.get(i);
+
+                                Connection connection = connectionsTable.get(p1).get(p2);
+                                if (connection == null) {
+                                    connection = connectionsTable.get(p2).get(p1);
+                                }
+                                connection.startSendingData(connection.getSource().equals(p1));
+                            }
+
+                            stopBtn.setDisable(false);
+
+                            Platform.runLater(() -> {
+                                long t = end.get() - begin.get() + mStartTime + System.currentTimeMillis();
+                                long frac = 0;
+                                String unit = "ns";
+                                if (t > 1000) {
+                                    frac = t % 1000;
+                                    t /= 1000;
+                                    unit = "mks";
+
+                                    if (t > 1000) {
+                                        frac = t % 1000;
+                                        t /= 1000;
+                                        unit = "ms";
+
+                                        if (t > 1000) {
+                                            frac = t % 1000;
+                                            t /= 1000;
+                                            unit = "s";
+                                        }
+                                    }
+                                }
+                                time.setText(String.format("≈ %d.%03d %s", t, frac, unit));
+                                distance.setText(String.valueOf(fuzzyData.getMetrics()));
+                                availability.setText(String.format("%.5f", fuzzyData.getAvailability()));
+                            });
+                            resultsPane.setVisible(true);
+                        }
+
+                        //
                     }
                 }
 

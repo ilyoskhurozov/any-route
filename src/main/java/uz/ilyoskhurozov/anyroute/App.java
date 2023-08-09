@@ -14,9 +14,9 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("app.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        stage.setTitle("Any route");
+        stage.setTitle("Fuzzy route");
         stage.setScene(scene);
-        stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("/images/gps.png"))));
+        stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("/images/logo.jpg"))));
         stage.setMaximized(true);
         Controller controller = fxmlLoader.getController();
         controller.bindKeys();

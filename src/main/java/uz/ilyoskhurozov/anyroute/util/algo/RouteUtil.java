@@ -7,7 +7,7 @@ public class RouteUtil {
             case "Dijkstra" -> new Dijkstra();
             case "Floyd" -> new Floyd();
             case "Bellman-Ford" -> new BellmanFord();
-            case "Fuzzy logic" -> new FuzzyLogic();
+            case "Fuzzy logic", "Fuzzy logic2" -> new FuzzyLogic();
             default -> throw new RuntimeException("Not implemented Algorithm");
         };
     }
