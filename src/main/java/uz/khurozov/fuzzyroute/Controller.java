@@ -677,7 +677,7 @@ public class Controller {
 
         List<FuzzyData> evaluatedList = new ArrayList<>();
 
-        String fileName = "src/main/java/uz/ilyoskhurozov/anyroute/util/Model.fcl";
+        String fileName = "src/main/resources/Model.fcl";
         FIS fis = FIS.load(fileName, true);
 
         if (fis == null) {
