@@ -1,6 +1,6 @@
-package uz.ilyoskhurozov.anyroute.util.algo;
+package uz.khurozov.fuzzyroute.util.algo;
 
-import uz.ilyoskhurozov.anyroute.component.Node;
+import uz.khurozov.fuzzyroute.component.Node;
 
 import java.util.*;
 

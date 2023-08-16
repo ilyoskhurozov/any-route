@@ -1,4 +1,4 @@
-package uz.ilyoskhurozov.anyroute.component;
+package uz.khurozov.fuzzyroute.component;
 
 import javafx.application.Platform;
 import javafx.beans.binding.DoubleBinding;
@@ -11,7 +11,6 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import uz.ilyoskhurozov.anyroute.util.GlobalVariables;
 
 import java.util.ArrayList;
 

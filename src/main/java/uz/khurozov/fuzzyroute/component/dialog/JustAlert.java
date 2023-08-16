@@ -1,4 +1,4 @@
-package uz.ilyoskhurozov.anyroute.component.dialog;
+package uz.khurozov.fuzzyroute.component.dialog;
 
 import javafx.scene.control.Alert;
 

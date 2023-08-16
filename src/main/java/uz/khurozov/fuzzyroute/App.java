@@ -1,4 +1,4 @@
-package uz.ilyoskhurozov.anyroute;
+package uz.khurozov.fuzzyroute;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

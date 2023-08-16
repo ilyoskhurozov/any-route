@@ -1,4 +1,4 @@
-package uz.ilyoskhurozov.anyroute;
+package uz.khurozov.fuzzyroute;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -16,14 +16,14 @@ import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import net.sourceforge.jFuzzyLogic.FIS;
-import uz.ilyoskhurozov.anyroute.component.*;
-import uz.ilyoskhurozov.anyroute.component.dialog.*;
-import uz.ilyoskhurozov.anyroute.util.GlobalVariables;
-import uz.ilyoskhurozov.anyroute.util.ReliabilityGraphData;
-import uz.ilyoskhurozov.anyroute.util.TopologyData;
-import uz.ilyoskhurozov.anyroute.util.algo.Dijkstra;
-import uz.ilyoskhurozov.anyroute.util.algo.RouteAlgorithm;
-import uz.ilyoskhurozov.anyroute.util.algo.RouteUtil;
+import uz.khurozov.fuzzyroute.util.GlobalVariables;
+import uz.khurozov.fuzzyroute.util.ReliabilityGraphData;
+import uz.khurozov.fuzzyroute.util.TopologyData;
+import uz.khurozov.fuzzyroute.util.algo.Dijkstra;
+import uz.khurozov.fuzzyroute.util.algo.RouteAlgorithm;
+import uz.khurozov.fuzzyroute.util.algo.RouteUtil;
+import uz.khurozov.fuzzyroute.component.*;
+import uz.khurozov.fuzzyroute.component.dialog.*;
 
 import java.io.InputStream;
 import java.util.*;

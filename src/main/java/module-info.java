@@ -1,4 +1,4 @@
-module uz.ilyoskhurozov.anyroute {
+module uz.khurozov.fuzzyroute {
     requires javafx.controls;
     requires javafx.fxml;
 
@@ -6,6 +6,6 @@ module uz.ilyoskhurozov.anyroute {
     requires org.kordamp.ikonli.materialdesign2;
     requires jFuzzyLogic;
 
-    opens uz.ilyoskhurozov.anyroute to javafx.fxml;
-    exports uz.ilyoskhurozov.anyroute;
+    opens uz.khurozov.fuzzyroute to javafx.fxml;
+    exports uz.khurozov.fuzzyroute;
 }

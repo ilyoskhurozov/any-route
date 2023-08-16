@@ -1,4 +1,4 @@
-package uz.ilyoskhurozov.anyroute.util.algo;
+package uz.khurozov.fuzzyroute.util.algo;
 
 public class RouteUtil {
 

@@ -1,4 +1,4 @@
-package uz.ilyoskhurozov.anyroute.component;
+package uz.khurozov.fuzzyroute.component;
 
 import java.util.List;
 

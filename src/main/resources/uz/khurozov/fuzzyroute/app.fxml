@@ -21,7 +21,7 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/18"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.ilyoskhurozov.anyroute.Controller">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.khurozov.fuzzyroute.Controller">
     <center>
         <AnchorPane fx:id="desk" onMouseClicked="#mouseClickOnDesk" prefWidth="677.0" BorderPane.alignment="CENTER"/>
     </center>

@@ -1,4 +1,4 @@
-package uz.ilyoskhurozov.anyroute.util;
+package uz.khurozov.fuzzyroute.util;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
