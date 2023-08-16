@@ -52,6 +52,13 @@
             <artifactId>ikonli-materialdesign2-pack</artifactId>
             <version>12.3.0</version>
         </dependency>
+        <dependency>
+            <groupId>net.sourceforge</groupId>
+            <artifactId>jFuzzyLogic</artifactId>
+            <version>3.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/jFuzzyLogic.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
