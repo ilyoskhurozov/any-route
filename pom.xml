@@ -55,7 +55,7 @@
         <dependency>
             <groupId>net.sourceforge</groupId>
             <artifactId>jFuzzyLogic</artifactId>
-            <version>3.1</version>
+            <version>3.3</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/src/main/resources/jFuzzyLogic.jar</systemPath>
         </dependency>
