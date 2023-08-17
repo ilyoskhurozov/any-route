@@ -677,11 +677,11 @@ public class Controller {
 
         List<FuzzyData> evaluatedList = new ArrayList<>();
 
-        String fileName = "src/main/resources/Model.fcl";
-        FIS fis = FIS.load(fileName, true);
+        InputStream model = getClass().getResourceAsStream("/Model.fcl");
+        FIS fis = FIS.load(model, true);
 
         if (fis == null) {
-            System.err.println("Cannot load file: " + fileName);
+            System.err.println("Cannot load file: Model.fcl");
             return null;
         }
 
