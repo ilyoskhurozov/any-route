@@ -15,7 +15,7 @@ public class JustAlert extends Alert {
         AT_LEAST_TWO_ROUTERS(AlertType.WARNING, "Make sure there's at least 2 routers."),
         TOPOLOGY_NAME_EXISTS(AlertType.WARNING, "There is topology with this name."),
         DELETE_TOPOLOGY_CACHE_CONFIRMATION(AlertType.CONFIRMATION, "Do you want to delete topology cache"),
-        SOURCE_CODE(AlertType.INFORMATION, "Source code: https://github.com/ilyoskhurozov/any-route");
+        SOURCE_CODE(AlertType.INFORMATION, "Source code: https://github.com/khurozov/fuzzy-route");
 
         public final AlertType type;
         public final String text;
