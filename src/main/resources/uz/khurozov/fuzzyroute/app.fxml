@@ -158,20 +158,18 @@
         <MenuBar BorderPane.alignment="CENTER">
             <Menu mnemonicParsing="false" text="Topology parameters">
                 <Menu mnemonicParsing="false" text="Buffer cache">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#saveTopology" text="Save topology to cache">
-                            <accelerator>
-                                <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN"
-                                                    shortcut="UP"/>
-                            </accelerator>
-                        </MenuItem>
-                        <MenuItem mnemonicParsing="false" onAction="#clearCache" text="Clear cache">
-                            <accelerator>
-                                <KeyCodeCombination alt="UP" code="DELETE" control="DOWN" meta="UP" shift="DOWN"
-                                                    shortcut="UP"/>
-                            </accelerator>
-                        </MenuItem>
-                    </items>
+                    <MenuItem mnemonicParsing="false" onAction="#saveTopology" text="Save topology to cache">
+                        <accelerator>
+                            <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="DOWN"
+                                                shortcut="UP"/>
+                        </accelerator>
+                    </MenuItem>
+                    <MenuItem mnemonicParsing="false" onAction="#clearCache" text="Clear cache">
+                        <accelerator>
+                            <KeyCodeCombination alt="UP" code="DELETE" control="DOWN" meta="UP" shift="DOWN"
+                                                shortcut="UP"/>
+                        </accelerator>
+                    </MenuItem>
                 </Menu>
                 <MenuItem mnemonicParsing="false" onAction="#graphByTopology" text="Open from buffer cache">
                     <accelerator>
@@ -186,12 +184,10 @@
                 <MenuItem mnemonicParsing="false" onAction="#setUpAvailability" text="Availability values"/>
             </Menu>
             <Menu mnemonicParsing="false" text="Algorithm block-schema">
-                <items>
-                    <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Dijkstra"/>
-                    <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Floyd"/>
-                    <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Bellman-Ford"/>
-                    <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Fuzzy-Logic"/>
-                </items>
+                <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Dijkstra"/>
+                <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Floyd"/>
+                <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Bellman-Ford"/>
+                <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Fuzzy-Logic"/>
             </Menu>
         </MenuBar>
     </top>

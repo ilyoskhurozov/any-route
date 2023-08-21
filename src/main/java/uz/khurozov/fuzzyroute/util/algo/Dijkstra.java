@@ -46,10 +46,6 @@ public class Dijkstra extends RouteAlgorithm {
                 cur = nodeMap.get(cur.getPrevious());
             }
 
-//            System.out.println("route" + route);
-//            List<String> temp = new ArrayList<>(List.of(route.toString().replace("[", "").replace("]", "").split(",")));
-//            temp.replaceAll(String::trim);
-//            System.out.println("list" + temp);
             return route;
         }
     }
