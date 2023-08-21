@@ -89,10 +89,10 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
 
             setResultConverter(buttonType -> {
                 if (buttonType == ButtonType.OK) {
-                    GlobalVariables.routerAvailability = routerReliability.getValue() / 1000f;
-                    GlobalVariables.connectionAvailability = connectionReliability.getValue() / 1000f;
+                    GlobalVariables.routerAvailability = 1.0f * routerReliability.getValue() / ((SpinnerValueFactory.IntegerSpinnerValueFactory) routerReliability.getValueFactory()).getMax();
+                    GlobalVariables.connectionAvailability = 1.0f * connectionReliability.getValue() / ((SpinnerValueFactory.IntegerSpinnerValueFactory) connectionReliability.getValueFactory()).getMax();
                     return Map.of(
-                            "routerRel", routerReliability.getValue() / 1000.0,
+                            "routerRel", 1.0 * routerReliability.getValue() / ((SpinnerValueFactory.IntegerSpinnerValueFactory) routerReliability.getValueFactory()).getMax(),
                             "topologies", checks.stream()
                                     .filter(CheckBox::isSelected)
                                     .map(CheckBox::getText)
@@ -145,7 +145,7 @@ public class ComparingGraphDialog extends Dialog<Map<String, Object>> {
                 if (buttonType == ButtonType.OK) {
                     Map<String, String> st = stPane.getValue();
                     return Map.of(
-                            "routerRel", routerReliability.getValue() / 1000.0,
+                            "routerRel", 1.0 * routerReliability.getValue() / ((SpinnerValueFactory.IntegerSpinnerValueFactory) routerReliability.getValueFactory()).getMax(),
                             "source", st.get("source"),
                             "target", st.get("target"),
                             "cableCountFrom", ccFromSpinner.getValue(),
