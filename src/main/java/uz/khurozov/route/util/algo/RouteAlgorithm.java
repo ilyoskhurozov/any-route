@@ -1,4 +1,4 @@
-package uz.khurozov.fuzzyroute.util.algo;
+package uz.khurozov.route.util.algo;
 
 import java.util.List;
 import java.util.TreeMap;

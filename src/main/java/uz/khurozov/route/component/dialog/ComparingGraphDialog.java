@@ -1,4 +1,4 @@
-package uz.khurozov.fuzzyroute.component.dialog;
+package uz.khurozov.route.component.dialog;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
@@ -8,8 +8,8 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
-import uz.khurozov.fuzzyroute.component.SourceTargetPane;
-import uz.khurozov.fuzzyroute.util.GlobalVariables;
+import uz.khurozov.route.component.SourceTargetPane;
+import uz.khurozov.route.util.GlobalVariables;
 
 import java.util.List;
 import java.util.Map;

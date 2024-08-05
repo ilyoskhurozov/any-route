@@ -1,6 +1,6 @@
-package uz.khurozov.fuzzyroute.util.algo;
+package uz.khurozov.route.util.algo;
 
-import uz.khurozov.fuzzyroute.component.Node;
+import uz.khurozov.route.component.Node;
 
 import java.util.*;
 

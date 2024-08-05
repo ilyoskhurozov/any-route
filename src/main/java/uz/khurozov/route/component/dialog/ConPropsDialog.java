@@ -1,4 +1,4 @@
-package uz.khurozov.fuzzyroute.component.dialog;
+package uz.khurozov.route.component.dialog;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;

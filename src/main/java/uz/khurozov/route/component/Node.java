@@ -1,4 +1,4 @@
-package uz.khurozov.fuzzyroute.component;
+package uz.khurozov.route.component;
 
 public class Node {
     private final String name;

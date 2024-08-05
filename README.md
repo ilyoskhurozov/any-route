@@ -1,4 +1,4 @@
-# Fuzzy route
+# Route
 
 Application to compare and analyze route finding algorithms
 
@@ -6,7 +6,6 @@ Application to compare and analyze route finding algorithms
 * Dijkstra
 * Floyd
 * Bellman-Ford
-* Fuzzy logic
 
 ## Features:
 * Finding the shortest/fastest route using algorithms

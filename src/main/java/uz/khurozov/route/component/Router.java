@@ -1,4 +1,4 @@
-package uz.khurozov.fuzzyroute.component;
+package uz.khurozov.route.component;
 
 import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Pos;

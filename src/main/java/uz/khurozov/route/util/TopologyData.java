@@ -1,4 +1,4 @@
-package uz.khurozov.fuzzyroute.util;
+package uz.khurozov.route.util;
 
 import java.util.Map;
 

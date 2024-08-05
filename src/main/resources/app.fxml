@@ -22,7 +22,7 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/18"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.khurozov.fuzzyroute.Controller">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="uz.khurozov.route.Controller">
     <center>
         <AnchorPane fx:id="desk" onMouseClicked="#mouseClickOnDesk" prefWidth="677.0" BorderPane.alignment="CENTER" />
     </center>
@@ -198,7 +198,6 @@
                 <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Dijkstra" />
                 <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Floyd" />
                 <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Bellman-Ford" />
-                <MenuItem mnemonicParsing="false" onAction="#showSchema" text="Fuzzy-Logic" />
             </Menu>
         </MenuBar>
     </top>

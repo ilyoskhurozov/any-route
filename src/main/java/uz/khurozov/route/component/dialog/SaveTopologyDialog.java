@@ -1,4 +1,4 @@
-package uz.khurozov.fuzzyroute.component.dialog;
+package uz.khurozov.route.component.dialog;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
@@ -10,7 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
-import uz.khurozov.fuzzyroute.component.SourceTargetPane;
+import uz.khurozov.route.component.SourceTargetPane;
 
 import java.util.Map;
 import java.util.Set;

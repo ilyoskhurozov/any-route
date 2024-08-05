@@ -1,4 +1,4 @@
-package uz.khurozov.fuzzyroute.component.dialog;
+package uz.khurozov.route.component.dialog;
 
 import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
@@ -7,7 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
-import uz.khurozov.fuzzyroute.util.GlobalVariables;
+import uz.khurozov.route.util.GlobalVariables;
 
 public class AvailabilityDialog extends Dialog<AvailabilityDialog.ConProps> {
     public record ConProps(int routerAvailability, int connectionAvailability) {

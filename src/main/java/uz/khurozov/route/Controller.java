@@ -1,4 +1,4 @@
-package uz.khurozov.fuzzyroute;
+package uz.khurozov.route;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -15,14 +15,14 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import uz.khurozov.fuzzyroute.util.GlobalVariables;
-import uz.khurozov.fuzzyroute.util.ReliabilityGraphData;
-import uz.khurozov.fuzzyroute.util.TopologyData;
-import uz.khurozov.fuzzyroute.util.algo.Dijkstra;
-import uz.khurozov.fuzzyroute.util.algo.RouteAlgorithm;
-import uz.khurozov.fuzzyroute.util.algo.RouteUtil;
-import uz.khurozov.fuzzyroute.component.*;
-import uz.khurozov.fuzzyroute.component.dialog.*;
+import uz.khurozov.route.util.GlobalVariables;
+import uz.khurozov.route.util.ReliabilityGraphData;
+import uz.khurozov.route.util.TopologyData;
+import uz.khurozov.route.util.algo.Dijkstra;
+import uz.khurozov.route.util.algo.RouteAlgorithm;
+import uz.khurozov.route.util.algo.RouteUtil;
+import uz.khurozov.route.component.*;
+import uz.khurozov.route.component.dialog.*;
 
 import java.io.InputStream;
 import java.util.*;
