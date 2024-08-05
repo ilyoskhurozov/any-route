@@ -16,7 +16,7 @@ public class App extends Application {
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("Fuzzy route");
         stage.setScene(scene);
-        stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("/images/logo.jpg"))));
+        stage.getIcons().add(new Image(Objects.requireNonNull(App.class.getResourceAsStream("/images/gps.png"))));
         stage.setMaximized(true);
         Controller controller = fxmlLoader.getController();
         controller.bindKeys();

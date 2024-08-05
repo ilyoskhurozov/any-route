@@ -4,7 +4,6 @@ module uz.khurozov.fuzzyroute {
 
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.materialdesign2;
-    requires jFuzzyLogic;
 
     opens uz.khurozov.fuzzyroute to javafx.fxml;
     exports uz.khurozov.fuzzyroute;
